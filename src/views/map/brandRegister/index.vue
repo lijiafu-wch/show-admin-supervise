@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="商家id" prop="merchant">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
+      <el-form-item label="所属商家" prop="merchant">
         <el-input
           v-model="queryParams.merchant"
-          placeholder="请输入商家id"
+          placeholder="请输入商家名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -19,7 +19,20 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="商标注册号" prop="registerNo">
+
+      <el-form-item label="注册日期">
+        <el-date-picker
+          v-model="dateRange"
+          size="small"
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        />
+      </el-form-item>
+      <!-- <el-form-item label="商标注册号" prop="registerNo">
         <el-input
           v-model="queryParams.registerNo"
           placeholder="请输入商标注册号"
@@ -27,8 +40,8 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="商标注册企业" prop="registerEnterprise">
+      </el-form-item> -->
+      <!-- <el-form-item label="商标注册企业" prop="registerEnterprise">
         <el-input
           v-model="queryParams.registerEnterprise"
           placeholder="请输入商标注册企业"
@@ -36,8 +49,8 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="申请人" prop="applicant">
+      </el-form-item> -->
+      <!-- <el-form-item label="申请人" prop="applicant">
         <el-input
           v-model="queryParams.applicant"
           placeholder="请输入申请人"
@@ -45,16 +58,9 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="注册日期" prop="registerDate">
-        <el-date-picker clearable size="small" style="width: 200px"
-          v-model="queryParams.registerDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择注册日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="联系电话" prop="phone">
+      </el-form-item> -->
+
+      <!-- <el-form-item label="联系电话" prop="phone">
         <el-input
           v-model="queryParams.phone"
           placeholder="请输入联系电话"
@@ -85,7 +91,7 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -95,82 +101,98 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
+          v-hasPermi="['map:brandRegister:add']"
           type="primary"
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['map:brandRegister:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
+          v-hasPermi="['map:brandRegister:edit']"
           type="success"
           icon="el-icon-edit"
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['map:brandRegister:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
+          v-hasPermi="['map:brandRegister:remove']"
           type="danger"
           icon="el-icon-delete"
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['map:brandRegister:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
+          v-hasPermi="['map:brandRegister:export']"
           type="warning"
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['map:brandRegister:export']"
         >导出</el-button>
       </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="brandRegisterList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="删除标志" align="center" prop="id" />
-      <el-table-column label="商家id" align="center" prop="merchant" />
-      <el-table-column label="商标名称" align="center" prop="name" />
-      <el-table-column label="商标注册号" align="center" prop="registerNo" />
-      <el-table-column label="商标注册企业" align="center" prop="registerEnterprise" />
+      <el-table-column
+        label="所属商家"
+        align="center"
+        prop="merchantName"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="商标名称"
+        align="center"
+        prop="name"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="商标注册号"
+        align="center"
+        prop="registerNo"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="商标注册企业"
+        align="center"
+        prop="registerEnterprise"
+        :show-overflow-tooltip="true"
+      />
       <el-table-column label="申请人" align="center" prop="applicant" />
+      <el-table-column label="联系电话" align="center" prop="phone" />
+      <el-table-column label="申请人地址" align="center" prop="address" />
       <el-table-column label="注册日期" align="center" prop="registerDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.registerDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="联系电话" align="center" prop="phone" />
-      <el-table-column label="申请人地址" align="center" prop="address" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="状态1-启用,2-不启用" align="center" prop="status" />
-      <el-table-column label="删除标志" align="center" prop="deleted" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
+            v-hasPermi="['map:brandRegister:edit']"
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['map:brandRegister:edit']"
           >修改</el-button>
           <el-button
+            v-hasPermi="['map:brandRegister:remove']"
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['map:brandRegister:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -180,10 +202,10 @@
     />
 
     <!-- 添加或修改商标注册对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="商家id" prop="merchant">
-          <el-input v-model="form.merchant" placeholder="请输入商家id" />
+    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="所属商家" prop="merchant">
+          <el-input v-model="form.merchant" placeholder="请输入商家名称" />
         </el-form-item>
         <el-form-item label="商标名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商标名称" />
@@ -197,42 +219,37 @@
         <el-form-item label="申请人" prop="applicant">
           <el-input v-model="form.applicant" placeholder="请输入申请人" />
         </el-form-item>
-        <el-form-item label="注册日期" prop="registerDate">
-          <el-date-picker clearable size="small" style="width: 200px"
-            v-model="form.registerDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择注册日期">
-          </el-date-picker>
-        </el-form-item>
         <el-form-item label="联系电话" prop="phone">
           <el-input v-model="form.phone" placeholder="请输入联系电话" />
         </el-form-item>
         <el-form-item label="申请人地址" prop="address">
           <el-input v-model="form.address" placeholder="请输入申请人地址" />
         </el-form-item>
-        <el-form-item label="状态1-启用,2-不启用">
-          <el-radio-group v-model="form.status">
-            <el-radio label="1">请选择字典生成</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除标志" />
+        <el-form-item label="注册日期" prop="registerDate">
+          <el-date-picker
+            v-model="form.registerDate"
+            clearable
+            size="small"
+            style="width: 200px"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="选择注册日期"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
-    </el-dialog>
+      </el-dialog>
   </div>
 </template>
 
 <script>
-import { listBrandRegister, getBrandRegister, delBrandRegister, addBrandRegister, updateBrandRegister, exportBrandRegister } from "@/api/map/brandRegister";
+import { listBrandRegister, getBrandRegister, delBrandRegister, addBrandRegister, updateBrandRegister, exportBrandRegister } from '@/api/map/brandRegister'
 
 export default {
-  name: "BrandRegister",
+  name: 'BrandRegister',
   data() {
     return {
       // 遮罩层
@@ -248,9 +265,11 @@ export default {
       // 商标注册表格数据
       brandRegisterList: [],
       // 弹出层标题
-      title: "",
+      title: '',
       // 是否显示弹出层
       open: false,
+      // 日期范围
+      dateRange: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -271,25 +290,25 @@ export default {
       // 表单校验
       rules: {
       }
-    };
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     /** 查询商标注册列表 */
     getList() {
-      this.loading = true;
-      listBrandRegister(this.queryParams).then(response => {
-        this.brandRegisterList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
+      this.loading = true
+      listBrandRegister(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
+        this.brandRegisterList = response.rows
+        this.total = response.total
+        this.loading = false
+      })
     },
     // 取消按钮
     cancel() {
-      this.open = false;
-      this.reset();
+      this.open = false
+      this.reset()
     },
     // 表单重置
     reset() {
@@ -304,102 +323,103 @@ export default {
         phone: undefined,
         address: undefined,
         remark: undefined,
-        status: "0",
+        status: '0',
         createTime: undefined,
         updateTime: undefined,
         updateBy: undefined,
         createBy: undefined,
         deleted: undefined
-      };
-      this.resetForm("form");
+      }
+      this.resetForm('form')
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
-      this.getList();
+      this.queryParams.pageNum = 1
+      this.getList()
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.resetForm("queryForm");
-      this.handleQuery();
+      this.dateRange = []
+      this.resetForm('queryForm')
+      this.handleQuery()
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!=1
+      this.single = selection.length != 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
-      this.reset();
-      this.open = true;
-      this.title = "添加商标注册";
+      this.reset()
+      this.open = true
+      this.title = '添加商标注册'
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      this.reset();
+      this.reset()
       const id = row.id || this.ids
       getBrandRegister(id).then(response => {
-        this.form = response.data;
-        this.open = true;
-        this.title = "修改商标注册";
-      });
+        this.form = response.data
+        this.open = true
+        this.title = '修改商标注册'
+      })
     },
     /** 提交按钮 */
     submitForm: function() {
-      this.$refs["form"].validate(valid => {
+      this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id != undefined) {
             updateBrandRegister(this.form).then(response => {
               if (response.code === 200) {
-                this.msgSuccess("修改成功");
-                this.open = false;
-                this.getList();
+                this.msgSuccess('修改成功')
+                this.open = false
+                this.getList()
               } else {
-                this.msgError(response.msg);
+                this.msgError(response.msg)
               }
-            });
+            })
           } else {
             addBrandRegister(this.form).then(response => {
               if (response.code === 200) {
-                this.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
+                this.msgSuccess('新增成功')
+                this.open = false
+                this.getList()
               } else {
-                this.msgError(response.msg);
+                this.msgError(response.msg)
               }
-            });
+            })
           }
         }
-      });
+      })
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
-      this.$confirm('是否确认删除商标注册编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delBrandRegister(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        }).catch(function() {});
+      const ids = row.id || this.ids
+      this.$confirm('是否确认删除商标注册编号为"' + ids + '"的数据项?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(function() {
+        return delBrandRegister(ids)
+      }).then(() => {
+        this.getList()
+        this.msgSuccess('删除成功')
+      }).catch(function() {})
     },
     /** 导出按钮操作 */
     handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有商标注册数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportBrandRegister(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        }).catch(function() {});
+      const queryParams = this.queryParams
+      this.$confirm('是否确认导出所有商标注册数据项?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(function() {
+        return exportBrandRegister(queryParams)
+      }).then(response => {
+        this.download(response.msg)
+      }).catch(function() {})
     }
   }
-};
+}
 </script>
