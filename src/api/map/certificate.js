@@ -51,3 +51,11 @@ export function exportCertificate(query) {
     params: query
   })
 }
+
+// 下载导入模板
+export function importTemplate() {
+  return request({
+    url: '/map/certificate/importTemplate',
+    method: 'get'
+  })
+}
