@@ -22,7 +22,6 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-
         <el-form-item label="成立日期" prop="merchantDate">
           <el-date-picker
             v-model="queryParams.merchantDate"
@@ -38,26 +37,41 @@
           <el-cascader
           placeholder="行业分类"
           clearable
+          @change="businessCategoryChange"
           :options="optionsBusinessCategory"
           ></el-cascader>
         </el-form-item>
         <el-form-item label="经营状态" prop="operationStatus">
           <el-select v-model="queryParams.operationStatus" placeholder="请选择经营状态" clearable size="small">
-            <el-option label="请选择字典生成" value="" />
+            <el-option
+              v-for="item in operationList"
+              :key="item.dictValue"
+              :label="item.dictLabel"
+              :value="item.dictValue"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="特殊状态" prop="specialStatus">
           <el-select v-model="queryParams.specialStatus" placeholder="请选择特殊状态" clearable size="small">
-            <el-option label="请选择字典生成" value="" />
+             <el-option
+              v-for="item2 in specialList"
+              :key="item2.dictValue"
+              :label="item2.dictLabel"
+              :value="item2.dictValue"
+            />
           </el-select>
         </el-form-item>
 
         <el-form-item label="是否在平台公开" prop="publicStatus">
           <el-select v-model="queryParams.publicStatus" placeholder="请选择是否在平台公开" clearable size="small">
-            <el-option label="请选择字典生成" value="" />
+             <el-option
+              v-for="item3 in publicList"
+              :key="item3.dictValue"
+              :label="item3.dictLabel"
+              :value="item3.dictValue"
+            />
           </el-select>
         </el-form-item>
-
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -157,6 +171,10 @@
         :limit.sync="queryParams.pageSize"
         @pagination="getList"
       />
+      <el-tabs v-model="activeName" style="margin-top: 24px" @tab-click="handleClick">
+        <el-tab-pane label="证书管理" name="first">证书管理</el-tab-pane>
+        <el-tab-pane label="量具表" name="second">量具表</el-tab-pane>
+      </el-tabs>
       <!-- 添加或修改商家信息对话框 -->
       <el-dialog :title="title" :visible.sync="open" width="80%" append-to-body>
         <div class="infoBox">
@@ -165,7 +183,21 @@
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span> 企业名称</div>
             <el-input style="width: 33.3%" v-model="form.name" class="ib info_border_r" placeholder="请输入内容"></el-input>
             <div style="width: 16.6%" class="info_th ib info_border_r">商圈</div>
-            <el-input style="width: 16.6%" v-model="form.businessRoundId" class="ib" placeholder="请输入内容"></el-input>
+            <el-select
+              v-model="form.businessRoundId"
+              placeholder="商圈"
+              clearable
+              size="small"
+              style="width: 32.6%"
+              >
+                <el-option
+                  v-for="dict in businessRoundIdList"
+                  :key="dict.dictValue"
+                  :label="dict.dictLabel"
+                  :value="dict.dictValue"
+                />
+            </el-select>
+            <!-- <el-input style="width: 16.6%" v-model="form.businessRoundId" class="ib" placeholder="请输入内容"></el-input> -->
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>统一社会信用代码</div>
@@ -179,7 +211,16 @@
             <div style="width: 16.6%" class="info_th ib info_border_r">联系电话(对内)</div>
             <el-input style="width: 16.6%" v-model="form.inPhone" class="ib info_border_r" placeholder="请输入内容"></el-input>
             <div style="width: 16.6%" class="info_th ib info_border_r">成立日期</div>
-            <el-input style="width: 16.6%" v-model="form.merchantDate" class="ib" placeholder="请输入内容"></el-input>
+            <el-date-picker
+              v-model="form.merchantDate"
+              clearable
+              size="small"
+              style="width: 200px"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择成立日期"
+            />
+            <!-- <el-input style="width: 16.6%" v-model="form.merchantDate" class="ib" placeholder="请输入内容"></el-input> -->
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>选择区县、街道、社区</div>
@@ -324,6 +365,7 @@ export default {
   },
   data() {
     return {
+      activeName: 'first',
       // 用户导入参数
       upload: {
         // 是否显示弹出层（用户导入）
@@ -339,6 +381,7 @@ export default {
         // 上传的地址
         url: process.env.VUE_APP_BASE_API + "/system/user/importData"
       },
+      businessRoundIdList: [],// 商圈下拉
       treeData: [],
       defaultProps: {
         children: 'children',
@@ -407,18 +450,44 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+      },
+      operationList: [],
+      specialList: [],
+      publicList: []
     }
   },
   created() {
     this.getAllDistrict()
     this.getListBusinessCategory()
+    // 字典 经营状态
+    this.getDicts("map_operation_status").then(response => {
+      this.operationList = response.data;
+    });
+    // 特殊状态
+    this.getDicts("map_special_status").then(response => {
+      this.specialList = response.data;
+    });
+    // 是否公开
+    this.getDicts("map_public_status").then(response => {
+      this.publicList = response.data;
+    });
     // this.getList()
   },
   mounted() {
     window.addEventListener('message', this.hendMessage)
   },
   methods: {
+    // 分类选择查询赋值
+    businessCategoryChange (val) {
+      this.queryParams.firstBusinessCategory = val[0]
+      this.queryParams.secondBusinessCategory = val[1]
+      this.queryParams.threeBusinessCategory = val[2]
+      console.log(val, this.queryParams);
+      
+    },
+    handleClick(tab, event) {
+      console.log(tab, event);
+    },
     beforeAvatarUpload(file) {
       if (this.imageUrl.length > 2) {
         this.$message.error('2zahng!');
@@ -452,16 +521,25 @@ export default {
           case 1:
             // 区县
             this.queryParams.countyCode = data.code
+            this.queryParams.streetCode = undefined
+            this.queryParams.communityCode = undefined
             break;
           case 2:
             // 街道
+            this.queryParams.countyCode = undefined
+            this.queryParams.communityCode = undefined
             this.queryParams.streetCode = data.code
           break;
           case 3:
             // 社区
+            this.queryParams.countyCode = undefined
+            this.queryParams.streetCode = undefined
             this.queryParams.communityCode = data.code
           break;
           default:
+            this.queryParams.countyCode = undefined
+            this.queryParams.streetCode = undefined
+            this.queryParams.communityCode = undefined
             break;
         }
         this.getList()
@@ -601,6 +679,7 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1
+      console.log(this.queryParams)
       this.getList()
     },
     /** 重置按钮操作 */
