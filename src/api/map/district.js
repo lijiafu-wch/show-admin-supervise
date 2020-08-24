@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-08-23 09:00:10
+ * @LastEditTime: 2020-08-23 09:01:21
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /show-admin-supervise/src/api/map/district.js
+ */
 import request from '@/utils/request'
 
 // 查询行政区划列表
@@ -6,6 +14,14 @@ export function listDistrict(query) {
     url: '/map/district/list',
     method: 'get',
     params: query
+  })
+}
+
+// 获取行政区划整体json
+export function allDistrict() {
+  return request({
+    url: '/map/district/all',
+    method: 'get'
   })
 }
 

@@ -1,9 +1,18 @@
+/*
+ * @Author: your name
+ * @Date: 2020-08-23 09:00:10
+ * @LastEditTime: 2020-08-23 09:25:06
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /show-admin-supervise/src/api/map/businessCategory.js
+ */
 import request from '@/utils/request'
 
 // 查询行业分类列表
 export function listBusinessCategory(query) {
   return request({
-    url: '/map/businessCategory/list',
+    // url: '/map/businessCategory/list',
+    url: '/map/businessCategory/all',
     method: 'get',
     params: query
   })
