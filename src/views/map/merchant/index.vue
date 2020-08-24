@@ -35,6 +35,7 @@
         </el-form-item>
         <el-form-item label="行业分类">
           <el-cascader
+          v-model="businessCategoryContent"
           placeholder="行业分类"
           clearable
           @change="businessCategoryChange"
@@ -351,7 +352,7 @@
 </template>
 
 <script>
-import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant, exportMerchant } from '@/api/map/merchant'
+import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate } from '@/api/map/merchant'
 import { allDistrict } from '@/api/map/district'
 import { listBusinessCategory } from '@/api/map/businessCategory'
 import { getToken } from '@/utils/auth'
@@ -366,6 +367,7 @@ export default {
   data() {
     return {
       activeName: 'first',
+      businessCategoryContent: [], // 分类
       // 用户导入参数
       upload: {
         // 是否显示弹出层（用户导入）
@@ -379,7 +381,7 @@ export default {
         // 设置上传的请求头部
         headers: { Authorization: "Bearer " + getToken() },
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + "/system/user/importData"
+        url: process.env.VUE_APP_BASE_API + "/map/merchant/importData"
       },
       businessRoundIdList: [],// 商圈下拉
       treeData: [],
@@ -479,11 +481,10 @@ export default {
   methods: {
     // 分类选择查询赋值
     businessCategoryChange (val) {
+      if (!val) return
       this.queryParams.firstBusinessCategory = val[0]
       this.queryParams.secondBusinessCategory = val[1]
       this.queryParams.threeBusinessCategory = val[2]
-      console.log(val, this.queryParams);
-      
     },
     handleClick(tab, event) {
       console.log(tab, event);
@@ -612,7 +613,7 @@ export default {
     },
     /** 下载模板操作 */
     importTemplate() {
-      importTemplate().then(response => {
+      merchantimportTemplate().then(response => {
         this.download(response.msg);
       });
     },
@@ -679,7 +680,6 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1
-      console.log(this.queryParams)
       this.getList()
     },
     /** 重置按钮操作 */
@@ -688,6 +688,10 @@ export default {
       this.queryParams.countyCode = undefined
       this.queryParams.streetCode = undefined
       this.queryParams.communityCode = undefined
+      this.queryParams.firstBusinessCategory = undefined
+      this.queryParams.secondBusinessCategory = undefined
+      this.queryParams.threeBusinessCategory = undefined
+      this.businessCategoryContent = undefined
       this.handleQuery()
     },
     // 多选框选中数据

@@ -51,3 +51,11 @@ export function exportMerchant(query) {
     params: query
   })
 }
+
+// 下载导入模板
+export function merchantimportTemplate() {
+  return request({
+    url: 'map/merchant/importTemplate',
+    method: 'get'
+  })
+}
