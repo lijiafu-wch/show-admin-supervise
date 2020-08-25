@@ -192,14 +192,13 @@
               style="width: 32.6%"
               >
                 <el-option
-                  v-for="dict in businessRoundIdList"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
+                  v-for="dict in businessRoundlist"
+                  :key="dict.key"
+                  :label="dict.label"
+                  :value="dict.value"
                 />
             </el-select>
-            <!-- <el-input style="width: 16.6%" v-model="form.businessRoundId" class="ib" placeholder="请输入内容"></el-input> -->
-          </div>
+            </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>统一社会信用代码</div>
             <el-input style="width: 33.3%" v-model="form.creditCode" class="ib info_border_r" placeholder="请输入内容"></el-input>
@@ -212,20 +211,26 @@
             <div style="width: 16.6%" class="info_th ib info_border_r">联系电话(对内)</div>
             <el-input style="width: 16.6%" v-model="form.inPhone" class="ib info_border_r" placeholder="请输入内容"></el-input>
             <div style="width: 16.6%" class="info_th ib info_border_r">成立日期</div>
-            <el-date-picker
-              v-model="form.merchantDate"
-              clearable
-              size="small"
-              style="width: 200px"
-              type="date"
-              value-format="yyyy-MM-dd"
-              placeholder="选择成立日期"
-            />
-            <!-- <el-input style="width: 16.6%" v-model="form.merchantDate" class="ib" placeholder="请输入内容"></el-input> -->
-          </div>
+              <el-date-picker
+                v-model="form.merchantDate"
+                clearable
+                size="small"
+                style="width: 200px"
+                type="date"
+                value-format="yyyy-MM-dd"
+                placeholder="选择成立日期"
+              />
+            </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>选择区县、街道、社区</div>
-            <el-input style="width: 83.4%" v-model="form.countyCode"  placeholder="请输入内容"></el-input>
+            <el-cascader
+              style="width: 83.4%"
+              v-model="countyCode"
+              placeholder="选择区县、街道、社区"
+              clearable
+              @change="selCounty"
+              :options="treeData"
+              ></el-cascader>
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>详细地址</div>
@@ -237,13 +242,39 @@
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r">行业分类</div>
-            <el-input style="width: 83.4%" v-model="form.firstBusinessCategory" placeholder="请输入内容"></el-input>
+            <el-cascader
+            style="width: 83.4%"
+            v-model="businessCategoryContent2"
+            placeholder="行业分类"
+            clearable
+            @change="businessCategoryChange2"
+            :options="optionsBusinessCategory"
+            ></el-cascader>
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>经营状态</div>
-            <el-input style="width: 16.6%; border: 0" v-model="form.operationStatus" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-select v-model="form.operationStatus"
+                placeholder="经营状态"
+                clearable
+                class="ib info_border_r"
+                size="small"
+                style="width: 16.6%">
+              <el-option
+                v-for="item in operationList"
+                :key="item.dictValue"
+                :label="item.dictLabel"
+                :value="item.dictValue"
+              />
+            </el-select>
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>特殊状态</div>
-            <el-input style="width: 16.6%" v-model="form.specialStatus" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-select style="width: 16.6%" class="ib info_border_r" v-model="form.specialStatus" placeholder="请选择特殊状态" clearable size="small">
+              <el-option
+                v-for="item2 in specialList"
+                :key="item2.dictValue"
+                :label="item2.dictLabel"
+                :value="item2.dictValue"
+              />
+            </el-select>
             <div style="width: 16.6%" class="info_th ib info_border_r">用工人数</div>
             <el-input style="width: 16.6%" v-model="form.workerNum" class="ib" placeholder="请输入内容"></el-input>
           </div>
@@ -251,7 +282,14 @@
             <div style="width: 16.6%" class="info_th ib info_border_r">经营范围</div>
             <el-input style="width: 33.2%;" v-model="form.operationRange" class="ib info_border_r" placeholder="请输入内容"></el-input>
             <div style="width: 16.6%" class="info_th ib info_border_r">是否在平台公开</div>
-            <el-input style="width: 33.4%" v-model="form.publicStatus" class="ib" placeholder="请输入内容"></el-input>
+            <el-select v-model="form.publicStatus" style="width: 33.4%" placeholder="请选择是否在平台公开" clearable size="small">
+             <el-option
+              v-for="item3 in publicList"
+              :key="item3.dictValue"
+              :label="item3.dictLabel"
+              :value="item3.dictValue"
+            />
+          </el-select>
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_border_r biaozhun">标准化相关服务</div>
@@ -354,6 +392,7 @@
 <script>
 import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate } from '@/api/map/merchant'
 import { allDistrict } from '@/api/map/district'
+import { listBusinessRound } from '@/api/map/businessRound'
 import { listBusinessCategory } from '@/api/map/businessCategory'
 import { getToken } from '@/utils/auth'
 import Editor from '@/components/Editor';
@@ -367,7 +406,9 @@ export default {
   data() {
     return {
       activeName: 'first',
-      businessCategoryContent: [], // 分类
+      countyCode: [], // 街道假
+      businessCategoryContent: [], // 分类假
+      businessCategoryContent2: [], // 分类2假
       // 用户导入参数
       upload: {
         // 是否显示弹出层（用户导入）
@@ -383,7 +424,6 @@ export default {
         // 上传的地址
         url: process.env.VUE_APP_BASE_API + "/map/merchant/importData"
       },
-      businessRoundIdList: [],// 商圈下拉
       treeData: [],
       defaultProps: {
         children: 'children',
@@ -455,12 +495,14 @@ export default {
       },
       operationList: [],
       specialList: [],
-      publicList: []
+      publicList: [],
+      businessRoundlist: []
     }
   },
   created() {
     this.getAllDistrict()
     this.getListBusinessCategory()
+    this.getlistBusinessRound()
     // 字典 经营状态
     this.getDicts("map_operation_status").then(response => {
       this.operationList = response.data;
@@ -479,6 +521,31 @@ export default {
     window.addEventListener('message', this.hendMessage)
   },
   methods: {
+    // 商圈查询赋值
+    getlistBusinessRound () {
+      listBusinessRound()
+      .then(response => {
+       response.rows.forEach(element => {
+         this.businessRoundlist.push({ key: element.id, value: element.id,  label: element.name })
+       });
+      })
+      .catch((response) => {
+          console.log('失败', response);
+      })
+    },
+    // 选择新增区县赋值
+    selCounty (val) {
+      if (!val) return
+      this.form.countyCode = val[1]
+      this.form.streetCode = val[2]
+      this.form.communityCode = val[3]
+    },
+    businessCategoryChange2 (val) {
+      if (!val) return
+      this.form.firstBusinessCategory = val[0]
+      this.form.secondBusinessCategory = val[1]
+      this.form.threeBusinessCategory = val[2]
+    },
     // 分类选择查询赋值
     businessCategoryChange (val) {
       if (!val) return
@@ -491,25 +558,36 @@ export default {
     },
     beforeAvatarUpload(file) {
       if (this.imageUrl.length > 2) {
-        this.$message.error('2zahng!');
+        this.$message.error('最多上传两张照片!');
         return false
       }
-      const isJPG = file.type === 'image/jpeg';
+      // const isJPG = file.type === 'image/jpeg';
       const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isJPG) {
-        this.$message.error('上传图片只能是 JPG 格式!');
-      }
+      // if (!isJPG) {
+      //   this.$message.error('上传图片只能是 JPG 格式!');
+      // }
       if (!isLt2M) {
         this.$message.error('上传图片大小不能超过 2MB!');
       }
-      return isJPG && isLt2M;
+      return isLt2M;
     },
     handleAvatarSuccess(res, file, fileList) {
       this.imageUrl = fileList
-      console.log(this.imageUrl);
+      if (this.imageUrl && this.imageUrl.length > 0) {
+        this.form.pictureOne = this.imageUrl[0].response.url
+      }
+      if (this.imageUrl && this.imageUrl.length > 1) {
+        this.form.pictureTwo = this.imageUrl[1].response.url
+      }
     },
     handleRemove(file, fileList) {
       this.imageUrl = fileList
+      if (this.imageUrl && this.imageUrl.length > 0) {
+        this.form.pictureOne = this.imageUrl[0].response.url
+      }
+      if (this.imageUrl && this.imageUrl.length > 1) {
+        this.form.pictureTwo = this.imageUrl[1].response.url
+      }
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
@@ -549,6 +627,7 @@ export default {
     getTree (data) {
       for(var i = 0; i < data.length; i++) {
         data[i].label = data[i].name
+        data[i].value = data[i].code
         delete data[i].name
         if(data[i].children) {
           this.getTree(data[i].children)
@@ -658,11 +737,11 @@ export default {
         firstBusinessCategory: undefined,
         secondBusinessCategory: undefined,
         threeBusinessCategory: undefined,
-        operationStatus: '0',
-        specialStatus: '0',
+        operationStatus: undefined,
+        specialStatus: undefined,
         workerNum: undefined,
         operationRange: undefined,
-        publicStatus: '0',
+        publicStatus: undefined,
         productName: undefined,
         standardNo: undefined,
         detail: undefined,
@@ -675,6 +754,8 @@ export default {
         createBy: undefined,
         deleted: undefined
       }
+      this.countyCode = undefined
+      this.businessCategoryContent2 = undefined
       this.resetForm('form')
     },
     /** 搜索按钮操作 */
@@ -711,38 +792,38 @@ export default {
       this.reset()
       const id = row.id || this.ids
       getMerchant(id).then(response => {
+        console.log(response)
         this.form = response.data
+        this.countyCode = [undefined, response.data.countyCode, response.data.streetCode, response.data.communityCode]
+        this.businessCategoryContent2 = [response.data.firstBusinessCategory, response.data.secondBusinessCategory, response.data.threeBusinessCategory]
         this.open = true
         this.title = '修改商家信息'
       })
     },
     /** 提交按钮 */
     submitForm: function() {
-      this.$refs['form'].validate(valid => {
-        if (valid) {
-          if (this.form.id != undefined) {
-            updateMerchant(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess('修改成功')
-                this.open = false
-                this.getList()
-              } else {
-                this.msgError(response.msg)
-              }
-            })
+      console.log(this.form);
+      if (this.form.id != undefined) {
+        updateMerchant(this.form).then(response => {
+          if (response.code === 200) {
+            this.msgSuccess('修改成功')
+            this.open = false
+            this.getList()
           } else {
-            addMerchant(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess('新增成功')
-                this.open = false
-                this.getList()
-              } else {
-                this.msgError(response.msg)
-              }
-            })
+            this.msgError(response.msg)
           }
-        }
-      })
+        })
+      } else {
+        addMerchant(this.form).then(response => {
+          if (response.code === 200) {
+            this.msgSuccess('新增成功')
+            this.open = false
+            this.getList()
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      }
     },
     /** 删除按钮操作 */
     handleDelete(row) {
