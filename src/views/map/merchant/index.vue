@@ -127,7 +127,7 @@
           >导出</el-button>
         </el-col>
       </el-row>
-      <el-table v-loading="loading" :data="merchantList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" @row-click="rowClick" :data="merchantList" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
         <el-table-column label="商圈id" align="center" prop="businessRoundId" />
         <el-table-column label="企业名称" align="center" prop="name" />
@@ -173,8 +173,12 @@
         @pagination="getList"
       />
       <el-tabs v-model="activeName" style="margin-top: 24px" @tab-click="handleClick">
-        <el-tab-pane label="证书管理" name="first">证书管理</el-tab-pane>
-        <el-tab-pane label="量具表" name="second">量具表</el-tab-pane>
+        <el-tab-pane label="证书管理" name="first">
+          <certificateList ref="certificateList" />
+        </el-tab-pane>
+        <el-tab-pane label="量具表" name="second">
+          <measure ref="measure" />
+        </el-tab-pane>
       </el-tabs>
       <!-- 添加或修改商家信息对话框 -->
       <el-dialog :title="title" :visible.sync="open" width="80%" append-to-body>
@@ -397,12 +401,16 @@ import { listBusinessRound } from '@/api/map/businessRound'
 import { listBusinessCategory } from '@/api/map/businessCategory'
 import { getToken } from '@/utils/auth'
 import Editor from '@/components/Editor';
+import certificateList from './table_modules/certificateList';
+import measure from './table_modules/measure';
 
 listBusinessCategory
 export default {
   name: 'Merchant',
   components: {
-    Editor
+    Editor,
+    certificateList,
+    measure
   },
   data() {
     return {
@@ -459,7 +467,7 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5,
         businessRoundId: undefined,
         name: undefined,
         creditCode: undefined,
@@ -555,8 +563,23 @@ export default {
       this.queryParams.secondBusinessCategory = val[1]
       this.queryParams.threeBusinessCategory = val[2]
     },
+    // 表格切换
     handleClick(tab, event) {
-      console.log(tab, event);
+      console.log(this.activeName);
+      if (this.activeName === 'first') {
+        this.$refs.certificateList.getList()
+      } else {
+        this.$refs.measure.getList()
+      }
+    },
+    // 点击行
+    rowClick (val) {
+      if (this.activeName === 'first') {
+        this.$refs.certificateList.getList(val)
+      } else {
+        this.$refs.measure.getList(val)
+      }
+      console.log(val, this.activeName);
     },
     beforeAvatarUpload(file) {
       if (this.imageUrl.length > 2) {
@@ -893,6 +916,9 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  /deep/ .el-tabs__content {
+    overflow: scroll !important;
   }
   /deep/ .infoBox  input {
       border: 0 !important;
