@@ -834,3 +834,11 @@ export default {
     background: #eee;
   }
 </style>
+<style>
+.el-message-box__message p {
+    margin: 0;
+    line-height: 24px;
+    max-height: 800px;
+    overflow: scroll;
+}
+</style>
