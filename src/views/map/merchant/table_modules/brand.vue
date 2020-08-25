@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-08-25 14:23:37
- * @LastEditTime: 2020-08-25 15:42:38
+ * @LastEditTime: 2020-08-25 15:40:29
  * @LastEditors: Please set LastEditors
  * @Description: 证书info
  * @FilePath: /show-admin-supervise/src/views/map/merchant/table_modules/certificateList.vue
@@ -9,25 +9,38 @@
 <template>
   <div>
       <el-table v-loading="loading" :data="data">
-        <el-table-column
+<el-table-column
         label="所属商家"
         align="center"
         prop="merchantName"
         :show-overflow-tooltip="true"
       />
       <el-table-column
-        label="关联证书"
+        label="商标名称"
         align="center"
-        prop="cerCode"
-        :formatter="certificateFormat"
+        prop="name"
         :show-overflow-tooltip="true"
       />
-      <el-table-column label="有效期" align="center" prop="validDate" width="180">
+      <el-table-column
+        label="商标注册号"
+        align="center"
+        prop="registerNo"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column
+        label="商标注册企业"
+        align="center"
+        prop="registerEnterprise"
+        :show-overflow-tooltip="true"
+      />
+      <el-table-column label="申请人" align="center" prop="applicant" />
+      <el-table-column label="联系电话" align="center" prop="phone" />
+      <el-table-column label="申请人地址" align="center" prop="address" />
+      <el-table-column label="注册日期" align="center" prop="registerDate" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.validDate, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.registerDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
       </el-table>
       <pagination
         v-show="total>0"
@@ -41,7 +54,7 @@
 
 <script>
 
-import { listCertificate } from '@/api/map/certificate'
+import { listBrandRegister } from '@/api/map/brandRegister'
 
 export default {
     data () {
@@ -52,25 +65,14 @@ export default {
             queryParams: {
                 pageNum: 1,
                 pageSize: 5
-            },
-            certificateOptions: [ ]
+            }
         }
     },
-    created () {
-        this.getDicts('map_certificate_options').then(response => {
-            this.certificateOptions = response.data
-        })
-    },
     methods: {
-        // 证书code字典翻译
-        certificateFormat(row, column) {
-            return this.selectDictLabel(this.certificateOptions, row.cerCode)
-        },
         getList (val) {
-            
             this.loading = true
             this.queryParams.merchant = val
-            listCertificate(this.queryParams).then(response => {
+            listBrandRegister(this.queryParams).then(response => {
                 this.data = response.rows
                 this.total = response.total
                 this.loading = false

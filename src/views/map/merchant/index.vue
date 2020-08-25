@@ -179,6 +179,9 @@
         <el-tab-pane label="量具表" name="second">
           <measure ref="measure" />
         </el-tab-pane>
+         <el-tab-pane label="商标" name="three">
+          <brand ref="brand" />
+        </el-tab-pane>
       </el-tabs>
       <!-- 添加或修改商家信息对话框 -->
       <el-dialog :title="title" :visible.sync="open" width="80%" append-to-body>
@@ -403,6 +406,7 @@ import { getToken } from '@/utils/auth'
 import Editor from '@/components/Editor';
 import certificateList from './table_modules/certificateList';
 import measure from './table_modules/measure';
+import brand from './table_modules/brand';
 
 listBusinessCategory
 export default {
@@ -410,7 +414,8 @@ export default {
   components: {
     Editor,
     certificateList,
-    measure
+    measure,
+    brand
   },
   data() {
     return {
@@ -497,6 +502,7 @@ export default {
         excelNo: undefined,
         deleted: undefined
       },
+      currentId: '',
       // 表单参数
       form: {},
       // 表单校验
@@ -565,21 +571,24 @@ export default {
     },
     // 表格切换
     handleClick(tab, event) {
-      console.log(this.activeName);
       if (this.activeName === 'first') {
-        this.$refs.certificateList.getList()
-      } else {
-        this.$refs.measure.getList()
+        this.$refs.certificateList.getList(this.currentId)
+      } else if (this.activeName === 'second'){
+        this.$refs.measure.getList(this.currentId)
+      } else if (this.activeName === 'three'){
+        this.$refs.brand.getList(this.currentId)
       }
     },
     // 点击行
     rowClick (val) {
+      this.currentId = val.id
       if (this.activeName === 'first') {
-        this.$refs.certificateList.getList(val)
-      } else {
-        this.$refs.measure.getList(val)
+        this.$refs.certificateList.getList(this.currentId)
+      } else if (this.activeName === 'second'){
+        this.$refs.measure.getList(this.currentId)
+      } else if (this.activeName === 'three'){
+        this.$refs.brand.getList(this.currentId)
       }
-      console.log(val, this.activeName);
     },
     beforeAvatarUpload(file) {
       if (this.imageUrl.length > 2) {
@@ -829,10 +838,9 @@ export default {
       this.reset()
       const id = row.id || this.ids
       getMerchant(id).then(response => {
-        console.log(response)
         if (response.data.pictureOne && response.data.pictureTwo) {
           this.filelist = [{name: '照片1', url: response.data.pictureOne}, {name: '照片2', url: response.data.pictureTwo}]
-        } else {
+        } else if (response.data.pictureOne){
           this.filelist = [{name: '照片1', url: response.data.pictureOne}]
         }
         this.form = response.data
