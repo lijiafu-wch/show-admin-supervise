@@ -260,8 +260,8 @@
                 size="small"
                 style="width: 16.6%">
               <el-option
-                v-for="item in operationList"
-                :key="item.dictValue"
+                v-for="(item, index) in operationList"
+                :key="index"
                 :label="item.dictLabel"
                 :value="item.dictValue"
               />
@@ -312,6 +312,7 @@
                 :headers="headers"
                 :before-upload="beforeAvatarUpload"
                 list-type="picture-card"
+                :file-list="filelist"
                 :on-success="handleAvatarSuccess"
                 :on-preview="handlePictureCardPreview"
                 :on-remove="handleRemove">
@@ -496,6 +497,7 @@ export default {
       operationList: [],
       specialList: [],
       publicList: [],
+      filelist: [],
       businessRoundlist: []
     }
   },
@@ -579,15 +581,28 @@ export default {
       if (this.imageUrl && this.imageUrl.length > 1) {
         this.form.pictureTwo = this.imageUrl[1].response.url
       }
+      if (!this.imageUrl || this.imageUrl.length === 0) {
+        this.form.pictureOne = ''
+        this.form.pictureTwo = ''
+      }
     },
     handleRemove(file, fileList) {
       this.imageUrl = fileList
-      if (this.imageUrl && this.imageUrl.length > 0) {
-        this.form.pictureOne = this.imageUrl[0].response.url
+      console.log(this.imageUrl);
+      if (this.imageUrl && this.imageUrl.length === 1) {
+        this.form.pictureOne = this.imageUrl[0].response ? this.imageUrl[0].response.url : this.imageUrl[0].url
+        this.form.pictureTwo = ''
       }
-      if (this.imageUrl && this.imageUrl.length > 1) {
-        this.form.pictureTwo = this.imageUrl[1].response.url
+      if (this.imageUrl && this.imageUrl.length === 2) {
+        this.form.pictureOne = this.imageUrl[0].response ? this.imageUrl[0].response.url : this.imageUrl[0].url
+
+        this.form.pictureTwo = this.imageUrl[1].response ? this.imageUrl[1].response.url : this.imageUrl[1].url
       }
+      if (this.imageUrl.length === 0) {
+        this.form.pictureOne = ''
+        this.form.pictureTwo = ''
+      }
+      console.log(fileList, this.form)
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
@@ -595,7 +610,6 @@ export default {
     },
     // 树节点点击
     handleNodeClick(data) {
-        console.log(data);
         switch (data.level) {
           case 1:
             // 区县
@@ -793,11 +807,19 @@ export default {
       const id = row.id || this.ids
       getMerchant(id).then(response => {
         console.log(response)
+        if (response.data.pictureOne && response.data.pictureTwo) {
+          this.filelist = [{name: '照片1', url: response.data.pictureOne}, {name: '照片2', url: response.data.pictureTwo}]
+        } else {
+          this.filelist = [{name: '照片1', url: response.data.pictureOne}]
+        }
         this.form = response.data
+        this.form.operationStatus = response.data.operationStatus + ''
+        this.form.specialStatus = response.data.specialStatus + ''
+        this.form.publicStatus = response.data.publicStatus + ''
         this.countyCode = [undefined, response.data.countyCode, response.data.streetCode, response.data.communityCode]
         this.businessCategoryContent2 = [response.data.firstBusinessCategory, response.data.secondBusinessCategory, response.data.threeBusinessCategory]
-        this.open = true
         this.title = '修改商家信息'
+        this.open = true
       })
     },
     /** 提交按钮 */
