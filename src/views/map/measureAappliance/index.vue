@@ -2,13 +2,21 @@
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="所属商家" prop="merchant">
-        <el-input
-          v-model="queryParams.merchant"
-          placeholder="请输入商家id"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+       <el-select
+            v-model="queryParams.merchant"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入商家名称"
+            :remote-method="remoteMethod"
+            :loading="loading">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
       </el-form-item>
       <el-form-item label="名称" prop="name">
         <el-input
@@ -150,7 +158,22 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="所属商家" prop="merchant">
-          <el-input v-model="form.merchant" placeholder="请输入商家id" />
+          <el-select
+            v-model="form.merchant"
+            filterable
+            remote
+            reserve-keyword
+            style="width: 100%"
+            placeholder="请输入商家名称"
+            :remote-method="remoteMethod"
+            :loading="loading">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入名称" />
@@ -192,6 +215,7 @@
 
 <script>
 import { listMeasureAappliance, getMeasureAappliance, delMeasureAappliance, addMeasureAappliance, updateMeasureAappliance, exportMeasureAappliance } from '@/api/map/measureAappliance'
+import { listMerchant } from '@/api/map/merchant'
 
 export default {
   name: 'MeasureAappliance',
@@ -199,6 +223,7 @@ export default {
     return {
       // 遮罩层
       loading: true,
+      options: [], 
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -241,6 +266,15 @@ export default {
     this.getList()
   },
   methods: {
+    remoteMethod (val) {
+      console.log(val);
+      listMerchant(
+        { name: val }
+      ).then(response => {
+          console.log(val);
+          this.options = response.rows
+      })
+    },
     /** 查询计量器具列表 */
     getList() {
       this.loading = true

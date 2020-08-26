@@ -2,13 +2,28 @@
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="所属商家" prop="merchant">
-        <el-input
+         <el-select
+            v-model="queryParams.merchant"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入商家名称"
+            :remote-method="remoteMethod"
+            :loading="loading">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        <!-- <el-input
           v-model="queryParams.merchant"
           placeholder="请输入商家名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
-        />
+        /> -->
       </el-form-item>
       <el-form-item label="商标名称" prop="name">
         <el-input
@@ -205,7 +220,23 @@
     <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="所属商家" prop="merchant">
-          <el-input v-model="form.merchant" placeholder="请输入商家名称" />
+          <el-select
+            v-model="form.merchant"
+            filterable
+            remote
+            reserve-keyword
+            style="width: 100%"
+            placeholder="请输入商家名称"
+            :remote-method="remoteMethod"
+            :loading="loading">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+          <!-- <el-input v-model="form.merchant" placeholder="请输入商家名称" /> -->
         </el-form-item>
         <el-form-item label="商标名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商标名称" />
@@ -247,11 +278,13 @@
 
 <script>
 import { listBrandRegister, getBrandRegister, delBrandRegister, addBrandRegister, updateBrandRegister, exportBrandRegister } from '@/api/map/brandRegister'
+import { listMerchant } from '@/api/map/merchant'
 
 export default {
   name: 'BrandRegister',
   data() {
     return {
+      options: [], 
       // 遮罩层
       loading: true,
       // 选中数组
@@ -296,6 +329,15 @@ export default {
     this.getList()
   },
   methods: {
+    remoteMethod (val) {
+      console.log(val);
+      listMerchant(
+        { name: val }
+      ).then(response => {
+          console.log(val);
+          this.options = response.rows
+      })
+    },
     /** 查询商标注册列表 */
     getList() {
       this.loading = true

@@ -2,15 +2,22 @@
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="所属商家" prop="merchant">
-        <el-input
-          v-model="queryParams.merchant"
-          placeholder="请输入商家名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+         <el-select
+            v-model="queryParams.merchant"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入商家名称"
+            :remote-method="remoteMethod"
+            :loading="loading">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
       </el-form-item>
-
       <el-form-item label="关联证书" prop="cerCode">
         <el-select v-model="queryParams.cerCode" placeholder="全部">
           <el-option value="">全部</el-option>
@@ -142,10 +149,26 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="所属商家" prop="merchant">
-          <el-input v-model="form.merchant" placeholder="请输入商家" />
+           <el-select
+            v-model="form.merchant"
+            filterable
+            remote
+            reserve-keyword
+            style="width: 100%"
+            placeholder="请输入商家名称"
+            :remote-method="remoteMethod"
+            :loading="loading">
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="关联证书" prop="cerCode">
-          <el-select v-model="form.cerCode" placeholder="关联证书" clearable size="small">
+            
+          <el-select style="width: 100%" v-model="form.cerCode" placeholder="关联证书" clearable size="small">
             <el-option
               v-for="dict in certificateOptions"
               :key="dict.dictValue"
@@ -160,7 +183,7 @@
             v-model="form.validDate"
             clearable
             size="small"
-            style="width: 200px"
+            style="width: 100%"
             type="date"
             value-format="yyyy-MM-dd"
             placeholder="选择有效期"
@@ -209,6 +232,8 @@
 <script>
 import { listCertificate, getCertificate, delCertificate, addCertificate, updateCertificate, exportCertificate, importTemplate } from '@/api/map/certificate'
 import { getToken } from '@/utils/auth'
+import { listMerchant } from '@/api/map/merchant'
+
 export default {
   name: 'Certificate',
   data() {
@@ -248,6 +273,7 @@ export default {
         // 上传的地址
         url: process.env.VUE_APP_BASE_API + '/map/certificate/importData'
       },
+      options: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -272,6 +298,15 @@ export default {
     })
   },
   methods: {
+    remoteMethod (val) {
+      console.log(val);
+      listMerchant(
+        { name: val }
+      ).then(response => {
+          console.log(val);
+          this.options = response.rows
+      })
+    },
     /** 查询证件信息列表 */
     getList() {
       this.loading = true
