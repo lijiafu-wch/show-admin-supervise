@@ -2,13 +2,7 @@
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="商圈名称" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入商圈名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+        <el-input v-model="queryParams.name" placeholder="请输入商圈名称" />
       </el-form-item>
       <!-- <el-form-item label="经度" prop="longitude">
         <el-input
@@ -165,10 +159,24 @@
           <el-input v-model="form.latitude" placeholder="请输入纬度" />
         </el-form-item>
         <el-form-item label="图片" prop="picture">
-          <el-input v-model="form.picture" placeholder="请输入图片" />
+          <el-upload
+            class="upload-demo"
+            action="/dev-api/common/upload"
+            :headers="headers"
+            :on-success="handleAvatarSuccess"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove"
+            :limit="1"
+            :file-list="fileList"
+            list-type="picture">
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+          </el-upload>
+          <!-- <el-input v-model="form.picture" placeholder="请输入图片" /> -->
         </el-form-item>
         <el-form-item label="介绍" prop="detal">
-          <el-input v-model="form.detal" type="textarea" placeholder="请输入内容" />
+          <Editor v-model="form.detail" />
+          <!-- <el-input v-model="form.detal" type="textarea" placeholder="请输入内容" /> -->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -181,11 +189,20 @@
 
 <script>
 import { listBusinessRound, getBusinessRound, delBusinessRound, addBusinessRound, updateBusinessRound, exportBusinessRound } from '@/api/map/businessRound'
+import Editor from '@/components/Editor';
+import { getToken } from '@/utils/auth'
 
 export default {
   name: 'BusinessRound',
+    components: {
+      Editor
+    },
   data() {
     return {
+      fileList: [],
+      headers: {
+				Authorization: 'Bearer ' + getToken()
+      },
       // 遮罩层
       loading: true,
       // 选中数组
@@ -202,6 +219,7 @@ export default {
       title: '',
       // 是否显示弹出层
       open: false,
+      imageUrl: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -226,6 +244,27 @@ export default {
     this.getList()
   },
   methods: {
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handleAvatarSuccess(res, file, fileList) {
+      this.imageUrl = fileList
+      if (this.imageUrl && this.imageUrl.length > 0) {
+        this.form.picture = this.imageUrl[0].response.url
+      }
+      if (!this.imageUrl || this.imageUrl.length === 0) {
+        this.form.picture = ''
+      }
+    },
+    handleRemove(file, fileList) {
+      this.imageUrl = fileList
+      if (this.imageUrl.length === 0) {
+        this.form.picture = ''
+      }
+      console.log(fileList, this.form)
+    },
+    
     /** 查询商圈列表 */
     getList() {
       this.loading = true
@@ -287,6 +326,7 @@ export default {
       const id = row.id || this.ids
       getBusinessRound(id).then(response => {
         this.form = response.data
+        this.fileList = [{name: '照片1', url: response.data.picture }]
         this.open = true
         this.title = '修改商圈'
       })
