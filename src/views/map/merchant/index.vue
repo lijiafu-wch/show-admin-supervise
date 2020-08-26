@@ -4,14 +4,27 @@
     <div class="treeline"></div>
     <div class="treeGrid">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
-        <el-form-item label="商圈id" prop="businessRoundId">
-          <el-input
+        <el-form-item label="商圈" prop="businessRoundId">
+          <!-- <el-input
             v-model="queryParams.businessRoundId"
             placeholder="请输入商圈id"
             clearable
             size="small"
             @keyup.enter.native="handleQuery"
-          />
+          /> -->
+          <el-select
+              v-model="queryParams.businessRoundId"
+              placeholder="商圈"
+              clearable
+              size="small"
+              >
+                <el-option
+                  v-for="dict in businessRoundlist"
+                  :key="dict.key"
+                  :label="dict.label"
+                  :value="dict.value"
+                />
+            </el-select>
         </el-form-item>
         <el-form-item label="企业名称" prop="name">
           <el-input
@@ -146,7 +159,7 @@
         <el-table-column label="经营状态" align="center" prop="operationStatus" />
         <el-table-column label="特殊状态" align="center" prop="specialStatus" />
         <el-table-column label="是否在平台公开" align="center" prop="publicStatus" />
-        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="150" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button
               v-hasPermi="['map:merchant:edit']"
@@ -191,20 +204,20 @@
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span> 企业名称</div>
             <el-input style="width: 33.3%" v-model="form.name" class="ib info_border_r" placeholder="请输入内容"></el-input>
             <div style="width: 16.6%" class="info_th ib info_border_r">商圈</div>
-            <el-select
-              v-model="form.businessRoundId"
-              placeholder="商圈"
-              clearable
-              size="small"
-              style="width: 32.6%"
-              >
-                <el-option
-                  v-for="dict in businessRoundlist"
-                  :key="dict.key"
-                  :label="dict.label"
-                  :value="dict.value"
-                />
-            </el-select>
+              <el-select
+                v-model="form.businessRoundId"
+                placeholder="商圈"
+                clearable
+                size="small"
+                style="width: 32.6%"
+                >
+                  <el-option
+                    v-for="dict in businessRoundlist"
+                    :key="dict.key"
+                    :label="dict.label"
+                    :value="dict.value"
+                  />
+              </el-select>
             </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>统一社会信用代码</div>
@@ -531,7 +544,7 @@ export default {
     this.getDicts("map_public_status").then(response => {
       this.publicList = response.data;
     });
-    // this.getList()
+    this.getList()
   },
   mounted() {
     window.addEventListener('message', this.hendMessage)
@@ -620,7 +633,6 @@ export default {
     },
     handleRemove(file, fileList) {
       this.imageUrl = fileList
-      console.log(this.imageUrl);
       if (this.imageUrl && this.imageUrl.length === 1) {
         this.form.pictureOne = this.imageUrl[0].response ? this.imageUrl[0].response.url : this.imageUrl[0].url
         this.form.pictureTwo = ''
