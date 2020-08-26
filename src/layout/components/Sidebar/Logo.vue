@@ -7,7 +7,7 @@
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">{{ title }} </h1>
+        <h1 class="sidebar-title">市场监督局平台  </h1>
       </router-link>
     </transition>
   </div>
@@ -26,7 +26,7 @@ export default {
   },
   data() {
     return {
-      title: '若依管理系统',
+      title: '市场监督局企业数据管理平台',
       logo: logoImg
     }
   }

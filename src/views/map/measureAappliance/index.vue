@@ -101,20 +101,20 @@
         :show-overflow-tooltip="true"
       />
       <el-table-column label="型号" align="center" prop="model" />
-      <el-table-column
+   <!--   <el-table-column
         label="生产厂家"
         align="center"
         prop="factoryName"
         :show-overflow-tooltip="true"
-      />
+      /> -->
       <el-table-column label="出厂编号" align="center" prop="leaveNo" />
-      <el-table-column
+     <!-- <el-table-column
         label="用途"
         align="center"
         prop="purpose"
         :show-overflow-tooltip="true"
-      />
-      <el-table-column label="检定情况" align="center" prop="checkCase" />
+      /> -->
+      <!-- <el-table-column label="检定情况" align="center" prop="checkCase" /> -->
       <el-table-column label="有效期" align="center" prop="validDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.validDate, '{y}-{m}-{d}') }}</span>
@@ -181,18 +181,18 @@
         <el-form-item label="型号" prop="model">
           <el-input v-model="form.model" placeholder="请输入型号" />
         </el-form-item>
-        <el-form-item label="生产厂家" prop="factoryName">
+        <!-- <el-form-item label="生产厂家" prop="factoryName">
           <el-input v-model="form.factoryName" placeholder="请输入生产厂家" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="出厂编号" prop="leaveNo">
           <el-input v-model="form.leaveNo" placeholder="请输入出厂编号" />
         </el-form-item>
-        <el-form-item label="用途" prop="purpose">
+      <!--  <el-form-item label="用途" prop="purpose">
           <el-input v-model="form.purpose" placeholder="请输入用途" />
         </el-form-item>
         <el-form-item label="检定情况" prop="checkCase">
           <el-input v-model="form.checkCase" placeholder="请输入检定情况" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="有效期" prop="validDate">
           <el-date-picker
             v-model="form.validDate"
@@ -223,7 +223,7 @@ export default {
     return {
       // 遮罩层
       loading: true,
-      options: [], 
+      options: [],
       // 选中数组
       ids: [],
       // 非单个禁用

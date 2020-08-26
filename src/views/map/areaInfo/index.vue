@@ -10,34 +10,17 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="分类1-街道  2-社区  3-学区" prop="type">
-        <el-select v-model="queryParams.type" placeholder="请选择分类1-街道  2-社区  3-学区" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="图片" prop="picture">
-        <el-input
-          v-model="queryParams.picture"
-          placeholder="请输入图片"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="状态1-启用,2-不启用" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态1-启用,2-不启用" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="删除标志" prop="deleted">
-        <el-input
-          v-model="queryParams.deleted"
-          placeholder="请输入删除标志"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
+     <el-form-item label="分类" prop="type">
+       <el-select v-model="queryParams.type" placeholder="全部">
+         <el-option value="">全部</el-option>
+         <el-option
+           v-for="dict in typeOptions"
+           :key="dict.dictValue"
+           :label="dict.dictLabel"
+           :value="dict.dictValue"
+         />
+       </el-select>
+     </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -87,14 +70,15 @@
 
     <el-table v-loading="loading" :data="areaInfoList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="删除标志" align="center" prop="id" />
       <el-table-column label="名称" align="center" prop="name" />
-      <el-table-column label="分类1-街道  2-社区  3-学区" align="center" prop="type" />
-      <el-table-column label="geojson信息" align="center" prop="geojson信息" />
-      <el-table-column label="介绍" align="center" prop="detal" />
-      <el-table-column label="图片" align="center" prop="picture" />
-      <el-table-column label="状态1-启用,2-不启用" align="center" prop="status" />
-      <el-table-column label="删除标志" align="center" prop="deleted" />
+      <el-table-column
+        label="分类"
+        align="center"
+        prop="type"
+        :formatter="typeFormat"
+        :show-overflow-tooltip="true"
+      />
+      <!-- <el-table-column label="介绍" align="center" prop="detal" /> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -114,7 +98,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -129,27 +113,22 @@
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入名称" />
         </el-form-item>
-        <el-form-item label="分类1-街道  2-社区  3-学区">
-          <el-select v-model="form.type" placeholder="请选择分类1-街道  2-社区  3-学区">
-            <el-option label="请选择字典生成" value="" />
+        <el-form-item label="分类" prop="type">
+          <el-select style="width: 100%" v-model="form.type" placeholder="分类" clearable size="small">
+            <el-option
+              v-for="dict in typeOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            />
           </el-select>
         </el-form-item>
-        <el-form-item label="geojson信息" prop="geojson信息">
-          <el-input v-model="form.geojson信息" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
+
         <el-form-item label="介绍" prop="detal">
           <el-input v-model="form.detal" type="textarea" placeholder="请输入内容" />
         </el-form-item>
         <el-form-item label="图片" prop="picture">
           <el-input v-model="form.picture" placeholder="请输入图片" />
-        </el-form-item>
-        <el-form-item label="状态1-启用,2-不启用">
-          <el-radio-group v-model="form.status">
-            <el-radio label="1">请选择字典生成</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除标志" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -183,6 +162,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 区域分类数据字典
+      typeOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -204,6 +185,9 @@ export default {
   },
   created() {
     this.getList();
+    this.getDicts('map_area_type').then(response => {
+      this.typeOptions = response.data
+    })
   },
   methods: {
     /** 查询区域划分信息列表 */
@@ -242,6 +226,10 @@ export default {
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
+    },
+    // 区域分类字典翻译
+    typeFormat(row, column) {
+      return this.selectDictLabel(this.typeOptions, row.type)
     },
     /** 重置按钮操作 */
     resetQuery() {

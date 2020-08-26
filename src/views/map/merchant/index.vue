@@ -1,31 +1,10 @@
 <template>
   <div class="app-container">
-    <el-tree class="treelist" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
-    <div class="treeline"></div>
+    <el-tree class="treelist" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
+    <div class="treeline" />
     <div class="treeGrid">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
-        <el-form-item label="商圈" prop="businessRoundId">
-          <!-- <el-input
-            v-model="queryParams.businessRoundId"
-            placeholder="请输入商圈id"
-            clearable
-            size="small"
-            @keyup.enter.native="handleQuery"
-          /> -->
-          <el-select
-              v-model="queryParams.businessRoundId"
-              placeholder="商圈"
-              clearable
-              size="small"
-              >
-                <el-option
-                  v-for="dict in businessRoundlist"
-                  :key="dict.key"
-                  :label="dict.label"
-                  :value="dict.value"
-                />
-            </el-select>
-        </el-form-item>
+
         <el-form-item label="企业名称" prop="name">
           <el-input
             v-model="queryParams.name"
@@ -35,27 +14,44 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="成立日期" prop="merchantDate">
-          <el-date-picker
-            v-model="queryParams.merchantDate"
-            clearable
-            size="small"
-            style="width: 200px"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择成立日期"
-          />
-        </el-form-item>
         <el-form-item label="行业分类">
           <el-cascader
-          v-model="businessCategoryContent"
-          placeholder="行业分类"
-          clearable
-          @change="businessCategoryChange"
-          :options="optionsBusinessCategory"
-          ></el-cascader>
+            v-model="businessCategoryContent"
+            placeholder="行业分类"
+            clearable
+            :options="optionsBusinessCategory"
+            @change="businessCategoryChange"
+          />
         </el-form-item>
-        <el-form-item label="经营状态" prop="operationStatus">
+        <el-form-item label="商圈" prop="businessRoundId">
+          <el-select
+            v-model="queryParams.businessRoundId"
+            placeholder="商圈"
+            clearable
+            size="small"
+          >
+            <el-option
+              v-for="dict in businessRoundlist"
+              :key="dict.key"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="成立日期">
+          <el-date-picker
+            v-model="dateRange"
+            size="small"
+            style="width: 240px"
+            value-format="yyyy-MM-dd"
+            type="daterange"
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+          />
+        </el-form-item>
+
+        <!-- <el-form-item label="经营状态" prop="operationStatus">
           <el-select v-model="queryParams.operationStatus" placeholder="请选择经营状态" clearable size="small">
             <el-option
               v-for="item in operationList"
@@ -85,7 +81,7 @@
               :value="item3.dictValue"
             />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -122,14 +118,14 @@
           >删除</el-button>
         </el-col>
         <el-col :span="1.5">
-            <el-button
-              type="info"
-              icon="el-icon-upload2"
-              size="mini"
-              @click="handleImport"
-              v-hasPermi="['system:user:import']"
-            >导入</el-button>
-          </el-col>
+          <el-button
+            v-hasPermi="['system:user:import']"
+            type="info"
+            icon="el-icon-upload2"
+            size="mini"
+            @click="handleImport"
+          >导入</el-button>
+        </el-col>
         <el-col :span="1.5">
           <el-button
             v-hasPermi="['map:merchant:export']"
@@ -140,25 +136,68 @@
           >导出</el-button>
         </el-col>
       </el-row>
-      <el-table v-loading="loading" @row-click="rowClick" :data="merchantList" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="merchantList" @row-click="rowClick" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="商圈id" align="center" prop="businessRoundId" />
-        <el-table-column label="企业名称" align="center" prop="name" />
-        <el-table-column label="法人代表" align="center" prop="legalPerson" />
-        <el-table-column label="成立日期" align="center" prop="merchantDate" width="180">
+        <el-table-column label="所属商圈" align="center" prop="businessRoundName" />
+        <el-table-column
+          label="企业名称"
+          align="center"
+          prop="name"
+          width="300px"
+          :show-overflow-tooltip="true"/>
+        <el-table-column
+          label="法人代表"
+          align="center"
+          prop="legalPerson"
+          width="100px"
+          :show-overflow-tooltip="true"/>
+        <el-table-column label="成立日期" align="center" prop="merchantDate" width="140">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.merchantDate, '{y}-{m}-{d}') }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="区县code" align="center" prop="countyCode" />
-        <el-table-column label="街道code" align="center" prop="streetCode" />
-        <el-table-column label="社区code" align="center" prop="communityCode" />
-        <el-table-column label="行业分类一级" align="center" prop="firstBusinessCategory" />
-        <el-table-column label="行业分类二级" align="center" prop="secondBusinessCategory" />
-        <el-table-column label="行业分类三级" align="center" prop="threeBusinessCategory" />
-        <el-table-column label="经营状态" align="center" prop="operationStatus" />
-        <el-table-column label="特殊状态" align="center" prop="specialStatus" />
-        <el-table-column label="是否在平台公开" align="center" prop="publicStatus" />
+        <el-table-column label="区县" align="center" prop="countyName" />
+        <el-table-column label="街道" align="center" prop="streetName" />
+        <el-table-column label="社区" align="center" prop="communityName" />
+        <el-table-column
+          label="行业分类一级"
+          align="center"
+          prop="firstBusinessCategoryName"
+          width="200px"
+          :show-overflow-tooltip="true"/>
+        <el-table-column
+           label="行业分类二级"
+           align="center"
+           prop="secondBusinessCategoryName"
+           width="150px"
+           :show-overflow-tooltip="true"/>
+        <el-table-column
+          label="行业分类三级"
+          align="center"
+          prop="threeBusinessCategoryName"
+          width="150px"
+          :show-overflow-tooltip="true"/>
+        <el-table-column
+          label="经营状态"
+          align="center"
+          prop="operationStatus"
+          :formatter="operationFormat"
+          width="100"
+        />
+        <el-table-column
+          label="特殊状态"
+          align="center"
+          prop="specialStatus"
+          :formatter="specialFormat"
+          width="100"
+        />
+        <el-table-column
+          label="特殊状态"
+          align="center"
+          prop="publicStatus"
+          :formatter="publicFormat"
+          width="100"
+        />
         <el-table-column label="操作" align="center" width="150" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button
@@ -192,7 +231,7 @@
         <el-tab-pane label="量具表" name="second">
           <measure ref="measure" />
         </el-tab-pane>
-         <el-tab-pane label="商标" name="three">
+        <el-tab-pane label="商标" name="three">
           <brand ref="brand" />
         </el-tab-pane>
       </el-tabs>
@@ -202,83 +241,85 @@
           <div class="info_title info_th">市场主体信息表</div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span> 企业名称</div>
-            <el-input style="width: 33.3%" v-model="form.name" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.name" style="width: 33.3%" class="ib info_border_r" placeholder="请输入内容" />
             <div style="width: 16.6%" class="info_th ib info_border_r">商圈</div>
-              <el-select
-                v-model="form.businessRoundId"
-                placeholder="商圈"
-                clearable
-                size="small"
-                style="width: 32.6%"
-                >
-                  <el-option
-                    v-for="dict in businessRoundlist"
-                    :key="dict.key"
-                    :label="dict.label"
-                    :value="dict.value"
-                  />
-              </el-select>
-            </div>
+            <el-select
+              v-model="form.businessRoundId"
+              placeholder="商圈"
+              clearable
+              size="small"
+              style="width: 32.6%"
+            >
+              <el-option
+                v-for="dict in businessRoundlist"
+                :key="dict.key"
+                :label="dict.label"
+                :value="dict.value"
+              />
+            </el-select>
+          </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>统一社会信用代码</div>
-            <el-input style="width: 33.3%" v-model="form.creditCode" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.creditCode" style="width: 33.3%" class="ib info_border_r" placeholder="请输入内容" />
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>法定代表人</div>
-            <el-input style="width: 16.6%" v-model="form.legalPerson" class="ib" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.legalPerson" style="width: 16.6%" class="ib" placeholder="请输入内容" />
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r">联系电话(对外)</div>
-            <el-input style="width: 16.7%" v-model="form.outPhone" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.outPhone" style="width: 16.7%" class="ib info_border_r" placeholder="请输入内容" />
             <div style="width: 16.6%" class="info_th ib info_border_r">联系电话(对内)</div>
-            <el-input style="width: 16.6%" v-model="form.inPhone" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.inPhone" style="width: 16.6%" class="ib info_border_r" placeholder="请输入内容" />
             <div style="width: 16.6%" class="info_th ib info_border_r">成立日期</div>
-              <el-date-picker
-                v-model="form.merchantDate"
-                clearable
-                size="small"
-                style="width: 200px"
-                type="date"
-                value-format="yyyy-MM-dd"
-                placeholder="选择成立日期"
-              />
-            </div>
+            <el-date-picker
+              v-model="form.merchantDate"
+              clearable
+              size="small"
+              style="width: 200px"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择成立日期"
+            />
+          </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>选择区县、街道、社区</div>
             <el-cascader
-              style="width: 83.4%"
               v-model="countyCode"
+              style="width: 83.4%"
               placeholder="选择区县、街道、社区"
               clearable
-              @change="selCounty"
               :options="treeData"
-              ></el-cascader>
+              @change="selCounty"
+            />
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>详细地址</div>
-            <el-input style="width: 33.3%" v-model="form.address" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.address" style="width: 33.3%" class="ib info_border_r" placeholder="请输入内容" />
             <div style="width: 12.5%" class="info_th ib info_border_r">经度</div>
-            <el-input style="width: 12.5%" class="info_border_r" v-model="form.longitude"  placeholder="请输入内容"></el-input>
+            <el-input v-model="form.longitude" style="width: 12.5%" class="info_border_r" placeholder="请输入内容" />
             <div style="width: 12.5%" class="info_th ib info_border_r">纬度</div>
-            <el-input style="width: 12.5%" v-model="form.latitude"  placeholder="请输入内容"></el-input>
+            <el-input v-model="form.latitude" style="width: 12.5%" placeholder="请输入内容" />
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r">行业分类</div>
             <el-cascader
-            style="width: 83.4%"
-            v-model="businessCategoryContent2"
-            placeholder="行业分类"
-            clearable
-            @change="businessCategoryChange2"
-            :options="optionsBusinessCategory"
-            ></el-cascader>
+              v-model="businessCategoryContent2"
+              style="width: 83.4%"
+              placeholder="行业分类"
+              clearable
+              :options="optionsBusinessCategory"
+              @change="businessCategoryChange2"
+            />
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>经营状态</div>
-            <el-select v-model="form.operationStatus"
-                placeholder="经营状态"
-                clearable
-                class="ib info_border_r"
-                size="small"
-                style="width: 16.6%">
+            <el-select
+              v-model="form.operationStatus"
+              placeholder="经营状态"
+              clearable
+              class="ib info_border_r"
+              size="small"
+              style="width: 16.6%"
+            >
               <el-option
                 v-for="(item, index) in operationList"
                 :key="index"
@@ -287,7 +328,7 @@
               />
             </el-select>
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>特殊状态</div>
-            <el-select style="width: 16.6%" class="ib info_border_r" v-model="form.specialStatus" placeholder="请选择特殊状态" clearable size="small">
+            <el-select v-model="form.specialStatus" style="width: 16.6%" class="ib info_border_r" placeholder="请选择特殊状态" clearable size="small">
               <el-option
                 v-for="item2 in specialList"
                 :key="item2.dictValue"
@@ -296,38 +337,38 @@
               />
             </el-select>
             <div style="width: 16.6%" class="info_th ib info_border_r">用工人数</div>
-            <el-input style="width: 16.6%" v-model="form.workerNum" class="ib" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.workerNum" style="width: 16.6%" class="ib" placeholder="请输入内容" />
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r">经营范围</div>
-            <el-input style="width: 33.2%;" v-model="form.operationRange" class="ib info_border_r" placeholder="请输入内容"></el-input>
+            <el-input v-model="form.operationRange" style="width: 33.2%;" class="ib info_border_r" placeholder="请输入内容" />
             <div style="width: 16.6%" class="info_th ib info_border_r">是否在平台公开</div>
             <el-select v-model="form.publicStatus" style="width: 33.4%" placeholder="请选择是否在平台公开" clearable size="small">
-             <el-option
-              v-for="item3 in publicList"
-              :key="item3.dictValue"
-              :label="item3.dictLabel"
-              :value="item3.dictValue"
-            />
-          </el-select>
+              <el-option
+                v-for="item3 in publicList"
+                :key="item3.dictValue"
+                :label="item3.dictLabel"
+                :value="item3.dictValue"
+              />
+            </el-select>
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_border_r biaozhun">标准化相关服务</div>
             <div class="ib" style="width: 83.4%">
               <div style="width: 100%">
                 <div style="width: 20%" class="info_th ib info_border_r info_border_b">企业成产产品名称</div>
-                <el-input style="width: 79%" v-model="form.productName" class="ib info_border_b" placeholder="请输入内容"></el-input>
+                <el-input v-model="form.productName" style="width: 79%" class="ib info_border_b" placeholder="请输入内容" />
               </div>
               <div style="width: 100%">
                 <div style="width: 20%" class="info_th ib info_border_r">执行标准编号</div>
-                <el-input style="width: 79%" v-model="form.standardNo" class="ib" placeholder="请输入内容"></el-input>
+                <el-input v-model="form.standardNo" style="width: 79%" class="ib" placeholder="请输入内容" />
               </div>
             </div>
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r">图片</div>
             <div style="width: 83.4%" class="info_th ib">
-             <el-upload
+              <el-upload
                 action="/dev-api/common/upload"
                 :headers="headers"
                 :before-upload="beforeAvatarUpload"
@@ -335,8 +376,9 @@
                 :file-list="filelist"
                 :on-success="handleAvatarSuccess"
                 :on-preview="handlePictureCardPreview"
-                :on-remove="handleRemove">
-                <i class="el-icon-plus"></i>
+                :on-remove="handleRemove"
+              >
+                <i class="el-icon-plus" />
               </el-upload>
               <el-dialog :visible.sync="dialogVisible">
                 <img width="100%" :src="dialogImageUrl" alt="">
@@ -369,16 +411,16 @@
           :auto-upload="false"
           drag
         >
-          <i class="el-icon-upload"></i>
+          <i class="el-icon-upload" />
           <div class="el-upload__text">
             将文件拖到此处，或
             <em>点击上传</em>
           </div>
-          <div class="el-upload__tip" slot="tip">
+          <div slot="tip" class="el-upload__tip">
             <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据
             <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
           </div>
-          <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
+          <div slot="tip" class="el-upload__tip" style="color:red">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
         </el-upload>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="submitFileForm">确 定</el-button>
@@ -416,10 +458,10 @@ import { allDistrict } from '@/api/map/district'
 import { listBusinessRound } from '@/api/map/businessRound'
 import { listBusinessCategory } from '@/api/map/businessCategory'
 import { getToken } from '@/utils/auth'
-import Editor from '@/components/Editor';
-import certificateList from './table_modules/certificateList';
-import measure from './table_modules/measure';
-import brand from './table_modules/brand';
+import Editor from '@/components/Editor'
+import certificateList from './table_modules/certificateList'
+import measure from './table_modules/measure'
+import brand from './table_modules/brand'
 
 listBusinessCategory
 export default {
@@ -436,20 +478,22 @@ export default {
       countyCode: [], // 街道假
       businessCategoryContent: [], // 分类假
       businessCategoryContent2: [], // 分类2假
+      // 日期范围
+      dateRange: [],
       // 用户导入参数
       upload: {
         // 是否显示弹出层（用户导入）
         open: false,
         // 弹出层标题（用户导入）
-        title: "",
+        title: '',
         // 是否禁用上传
         isUploading: false,
         // 是否更新已经存在的用户数据
         updateSupport: 0,
         // 设置上传的请求头部
-        headers: { Authorization: "Bearer " + getToken() },
+        headers: { Authorization: 'Bearer ' + getToken() },
         // 上传的地址
-        url: process.env.VUE_APP_BASE_API + "/map/merchant/importData"
+        url: process.env.VUE_APP_BASE_API + '/map/merchant/importData'
       },
       treeData: [],
       defaultProps: {
@@ -457,7 +501,7 @@ export default {
         label: 'label'
       },
       headers: {
-				Authorization: 'Bearer ' + getToken()
+        Authorization: 'Bearer ' + getToken()
       },
       imageUrl: [],
       dialogImageUrl: '',
@@ -521,8 +565,11 @@ export default {
       // 表单校验
       rules: {
       },
+      // 经营状态数据字典
       operationList: [],
+      // 特殊状态数据字典
       specialList: [],
+      // 是否公开数据字典
       publicList: [],
       filelist: [],
       businessRoundlist: []
@@ -533,17 +580,17 @@ export default {
     this.getListBusinessCategory()
     this.getlistBusinessRound()
     // 字典 经营状态
-    this.getDicts("map_operation_status").then(response => {
-      this.operationList = response.data;
-    });
+    this.getDicts('map_operation_status').then(response => {
+      this.operationList = response.data
+    })
     // 特殊状态
-    this.getDicts("map_special_status").then(response => {
-      this.specialList = response.data;
-    });
+    this.getDicts('map_special_status').then(response => {
+      this.specialList = response.data
+    })
     // 是否公开
-    this.getDicts("map_public_status").then(response => {
-      this.publicList = response.data;
-    });
+    this.getDicts('map_public_status').then(response => {
+      this.publicList = response.data
+    })
     this.getList()
   },
   mounted() {
@@ -551,32 +598,44 @@ export default {
   },
   methods: {
     // 商圈查询赋值
-    getlistBusinessRound () {
+    getlistBusinessRound() {
       listBusinessRound()
-      .then(response => {
-       response.rows.forEach(element => {
-         this.businessRoundlist.push({ key: element.id, value: element.id,  label: element.name })
-       });
-      })
-      .catch((response) => {
-          console.log('失败', response);
-      })
+        .then(response => {
+          response.rows.forEach(element => {
+            this.businessRoundlist.push({ key: element.id, value: element.id, label: element.name })
+          })
+        })
+        .catch((response) => {
+          console.log('失败', response)
+        })
+    },
+    // 经营状态
+    operationFormat(row, column) {
+      return this.selectDictLabel(this.operationList, row.operationStatus)
+    },
+    // 特殊状态
+    specialFormat(row, column) {
+      return this.selectDictLabel(this.specialList, row.specialStatus)
+    },
+    // 是否公开
+    publicFormat(row, column) {
+      return this.selectDictLabel(this.publicList, row.publicStatus)
     },
     // 选择新增区县赋值
-    selCounty (val) {
+    selCounty(val) {
       if (!val) return
       this.form.countyCode = val[1]
       this.form.streetCode = val[2]
       this.form.communityCode = val[3]
     },
-    businessCategoryChange2 (val) {
+    businessCategoryChange2(val) {
       if (!val) return
       this.form.firstBusinessCategory = val[0]
       this.form.secondBusinessCategory = val[1]
       this.form.threeBusinessCategory = val[2]
     },
     // 分类选择查询赋值
-    businessCategoryChange (val) {
+    businessCategoryChange(val) {
       if (!val) return
       this.queryParams.firstBusinessCategory = val[0]
       this.queryParams.secondBusinessCategory = val[1]
@@ -586,37 +645,37 @@ export default {
     handleClick(tab, event) {
       if (this.activeName === 'first') {
         this.$refs.certificateList.getList(this.currentId)
-      } else if (this.activeName === 'second'){
+      } else if (this.activeName === 'second') {
         this.$refs.measure.getList(this.currentId)
-      } else if (this.activeName === 'three'){
+      } else if (this.activeName === 'three') {
         this.$refs.brand.getList(this.currentId)
       }
     },
     // 点击行
-    rowClick (val) {
+    rowClick(val) {
       this.currentId = val.id
       if (this.activeName === 'first') {
         this.$refs.certificateList.getList(this.currentId)
-      } else if (this.activeName === 'second'){
+      } else if (this.activeName === 'second') {
         this.$refs.measure.getList(this.currentId)
-      } else if (this.activeName === 'three'){
+      } else if (this.activeName === 'three') {
         this.$refs.brand.getList(this.currentId)
       }
     },
     beforeAvatarUpload(file) {
       if (this.imageUrl.length > 2) {
-        this.$message.error('最多上传两张照片!');
+        this.$message.error('最多上传两张照片!')
         return false
       }
       // const isJPG = file.type === 'image/jpeg';
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt2M = file.size / 1024 / 1024 < 2
       // if (!isJPG) {
       //   this.$message.error('上传图片只能是 JPG 格式!');
       // }
       if (!isLt2M) {
-        this.$message.error('上传图片大小不能超过 2MB!');
+        this.$message.error('上传图片大小不能超过 2MB!')
       }
-      return isLt2M;
+      return isLt2M
     },
     handleAvatarSuccess(res, file, fileList) {
       this.imageUrl = fileList
@@ -649,86 +708,86 @@ export default {
       console.log(fileList, this.form)
     },
     handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
     },
     // 树节点点击
     handleNodeClick(data) {
-        switch (data.level) {
-          case 1:
-            // 区县
-            this.queryParams.countyCode = data.code
-            this.queryParams.streetCode = undefined
-            this.queryParams.communityCode = undefined
-            break;
-          case 2:
-            // 街道
-            this.queryParams.countyCode = undefined
-            this.queryParams.communityCode = undefined
-            this.queryParams.streetCode = data.code
-          break;
-          case 3:
-            // 社区
-            this.queryParams.countyCode = undefined
-            this.queryParams.streetCode = undefined
-            this.queryParams.communityCode = data.code
-          break;
-          default:
-            this.queryParams.countyCode = undefined
-            this.queryParams.streetCode = undefined
-            this.queryParams.communityCode = undefined
-            break;
-        }
-        this.getList()
+      switch (data.level) {
+        case 1:
+          // 区县
+          this.queryParams.countyCode = data.code
+          this.queryParams.streetCode = undefined
+          this.queryParams.communityCode = undefined
+          break
+        case 2:
+          // 街道
+          this.queryParams.countyCode = undefined
+          this.queryParams.communityCode = undefined
+          this.queryParams.streetCode = data.code
+          break
+        case 3:
+          // 社区
+          this.queryParams.countyCode = undefined
+          this.queryParams.streetCode = undefined
+          this.queryParams.communityCode = data.code
+          break
+        default:
+          this.queryParams.countyCode = undefined
+          this.queryParams.streetCode = undefined
+          this.queryParams.communityCode = undefined
+          break
+      }
+      this.getList()
     },
     // 处理当前街道社区的lable
-    getTree (data) {
-      for(var i = 0; i < data.length; i++) {
+    getTree(data) {
+      for (var i = 0; i < data.length; i++) {
         data[i].label = data[i].name
         data[i].value = data[i].code
         delete data[i].name
-        if(data[i].children) {
+        if (data[i].children) {
           this.getTree(data[i].children)
         }
       }
     },
     // 处理行业分类
-    getBusinessCategory (data) {
-      for(var i = 0; i < data.length; i++) {
+    getBusinessCategory(data) {
+      for (var i = 0; i < data.length; i++) {
         data[i].label = data[i].name
         data[i].value = data[i].code
         delete data[i].name
         delete data[i].code
-        if(data[i].children) {
+        if (data[i].children) {
           this.getBusinessCategory(data[i].children)
         }
       }
     },
     // 行业分类
-    getListBusinessCategory () {
+    getListBusinessCategory() {
       listBusinessCategory()
-      .then(response => {
-       console.log(response);
-       this.getBusinessCategory(response.data.root)
-        this.optionsBusinessCategory = response.data.root
-      })
-      .catch((response) => {
-          console.log('失败', response);
-      })
+        .then(response => {
+          console.log(response)
+          this.getBusinessCategory(response.data.root)
+          this.optionsBusinessCategory = response.data.root
+        })
+        .catch((response) => {
+          console.log('失败', response)
+        })
     },
-    getAllDistrict () {
+    getAllDistrict() {
       allDistrict()
-      .then(response => {
-        this.getTree(response.data.root)
-        // this.treeData = response.data.root
-        this.treeData = [{
-          label: '七台河市',
-          children: response.data.root
+        .then(response => {
+          this.getTree(response.data.root)
+          // this.treeData = response.data.root
+          this.treeData = [{
+            label: '七台河市',
+            children: response.data.root
           }]
-      })
-      .catch((response) => {
-          console.log('失败', response);
-      })
+        })
+        .catch((response) => {
+          console.log('失败', response)
+        })
     },
     hendMessage(event) {
       const data = event.data
@@ -737,7 +796,7 @@ export default {
     /** 查询商家信息列表 */
     getList() {
       this.loading = true
-      listMerchant(this.queryParams).then(response => {
+      listMerchant(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.merchantList = response.rows
         this.total = response.total
         this.loading = false
@@ -745,30 +804,30 @@ export default {
     },
     /** 导入按钮操作 */
     handleImport() {
-      this.upload.title = "用户导入";
-      this.upload.open = true;
+      this.upload.title = '用户导入'
+      this.upload.open = true
     },
     /** 下载模板操作 */
     importTemplate() {
       merchantimportTemplate().then(response => {
-        this.download(response.msg);
-      });
+        this.download(response.msg)
+      })
     },
     // 文件上传中处理
     handleFileUploadProgress(event, file, fileList) {
-      this.upload.isUploading = true;
+      this.upload.isUploading = true
     },
     // 文件上传成功处理
     handleFileSuccess(response, file, fileList) {
-      this.upload.open = false;
-      this.upload.isUploading = false;
-      this.$refs.upload.clearFiles();
-      this.$alert(response.msg, "导入结果", { dangerouslyUseHTMLString: true });
-      this.getList();
+      this.upload.open = false
+      this.upload.isUploading = false
+      this.$refs.upload.clearFiles()
+      this.$alert(response.msg, '导入结果', { dangerouslyUseHTMLString: true })
+      this.getList()
     },
     // 提交上传文件
     submitFileForm() {
-      this.$refs.upload.submit();
+      this.$refs.upload.submit()
     },
     // 取消按钮
     cancel() {
@@ -823,6 +882,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.dateRange = []
       this.resetForm('queryForm')
       this.queryParams.countyCode = undefined
       this.queryParams.streetCode = undefined
@@ -851,9 +911,9 @@ export default {
       const id = row.id || this.ids
       getMerchant(id).then(response => {
         if (response.data.pictureOne && response.data.pictureTwo) {
-          this.filelist = [{name: '照片1', url: response.data.pictureOne}, {name: '照片2', url: response.data.pictureTwo}]
-        } else if (response.data.pictureOne){
-          this.filelist = [{name: '照片1', url: response.data.pictureOne}]
+          this.filelist = [{ name: '照片1', url: response.data.pictureOne }, { name: '照片2', url: response.data.pictureTwo }]
+        } else if (response.data.pictureOne) {
+          this.filelist = [{ name: '照片1', url: response.data.pictureOne }]
         }
         this.form = response.data
         this.form.operationStatus = response.data.operationStatus + ''
@@ -867,7 +927,7 @@ export default {
     },
     /** 提交按钮 */
     submitForm: function() {
-      console.log(this.form);
+      console.log(this.form)
       if (this.form.id != undefined) {
         updateMerchant(this.form).then(response => {
           if (response.code === 200) {
@@ -976,7 +1036,8 @@ export default {
     margin-left: 24px;
   }
   .treelist {
-    width: 10%;
+    width: 15%;
+    margin-right: 15px;
   }
   .treeline {
     width: 1px;

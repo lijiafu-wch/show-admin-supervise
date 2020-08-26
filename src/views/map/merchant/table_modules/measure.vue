@@ -22,12 +22,12 @@
         :show-overflow-tooltip="true"
       />
       <el-table-column label="型号" align="center" prop="model" />
-      <el-table-column
+      <!-- <el-table-column
         label="生产厂家"
         align="center"
         prop="factoryName"
         :show-overflow-tooltip="true"
-      />
+      /> -->
       <el-table-column label="出厂编号" align="center" prop="leaveNo" />
       <el-table-column
         label="用途"
@@ -35,18 +35,18 @@
         prop="purpose"
         :show-overflow-tooltip="true"
       />
-      <el-table-column label="检定情况" align="center" prop="checkCase" />
+      <!-- <el-table-column label="检定情况" align="center" prop="checkCase" /> -->
       <el-table-column label="有效期" align="center" prop="validDate" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.validDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column
+     <!-- <el-table-column
         label="备注"
         align="center"
         prop="remark"
         :show-overflow-tooltip="true"
-      />
+      /> -->
       </el-table>
       <pagination
         v-show="total>0"
