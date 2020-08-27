@@ -326,7 +326,11 @@ export default {
       const id = row.id || this.ids
       getBusinessRound(id).then(response => {
         this.form = response.data
-        this.fileList = [{name: '照片1', url: response.data.picture }]
+        if (response.data.picture) {
+          this.fileList = [{name: '照片1', url: response.data.picture }]
+        } else {
+          this.fileList = []
+        }
         this.open = true
         this.title = '修改商圈'
       })

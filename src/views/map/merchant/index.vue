@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-tree class="treelist" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
+    <el-tree class="treelist" node-key="id" :default-expanded-keys="[1]" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
     <div class="treeline" />
     <div class="treeGrid">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
@@ -781,6 +781,7 @@ export default {
           this.getTree(response.data.root)
           // this.treeData = response.data.root
           this.treeData = [{
+            id: '1',
             label: '七台河市',
             children: response.data.root
           }]
