@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-08-23 09:00:10
- * @LastEditTime: 2020-08-23 09:25:06
+ * @LastEditTime: 2020-08-27 16:01:38
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /show-admin-supervise/src/api/map/businessCategory.js
@@ -17,7 +17,14 @@ export function listBusinessCategory(query) {
     params: query
   })
 }
-
+// 根据code 获取行业分类详细信息
+export function getpreBusinessCategory(query) {
+  return request({
+    url: '/map/businessCategory/code/',
+    method: 'get',
+    params: query
+  })
+}
 // 查询行业分类详细
 export function getBusinessCategory(id) {
   return request({

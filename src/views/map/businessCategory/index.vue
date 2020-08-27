@@ -1,51 +1,10 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="父id" prop="parentId">
-        <el-input
-          v-model="queryParams.parentId"
-          placeholder="请输入父id"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="行业名称" prop="name">
         <el-input
           v-model="queryParams.name"
           placeholder="请输入行业名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="行业代码" prop="code">
-        <el-input
-          v-model="queryParams.code"
-          placeholder="请输入行业代码"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="级别 1，2，3" prop="level">
-        <el-input
-          v-model="queryParams.level"
-          placeholder="请输入级别 1，2，3"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="状态1-启用,2-不启用" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态1-启用,2-不启用" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="删除标志" prop="deleted">
-        <el-input
-          v-model="queryParams.deleted"
-          placeholder="请输入删除标志"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -56,7 +15,6 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
@@ -98,17 +56,20 @@
       </el-col>
     </el-row>
 
-    <el-table v-loading="loading" :data="businessCategoryList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" row-key="id" :data="businessCategoryList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="删除标志" align="center" prop="id" />
-      <el-table-column label="父id" align="center" prop="parentId" />
-      <el-table-column label="行业名称" align="center" prop="name" />
-      <el-table-column label="行业代码" align="center" prop="code" />
-      <el-table-column label="级别 1，2，3" align="center" prop="level" />
-      <el-table-column label="状态1-启用,2-不启用" align="center" prop="status" />
-      <el-table-column label="删除标志" align="center" prop="deleted" />
+      <el-table-column label="行业名称" align="left" prop="name" />
+      <el-table-column label="行业代码" align="left" prop="code" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+           <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleAdd(scope.row)"
+            v-show="scope.row.level !== 3"
+            v-hasPermi="['map:businessCategory:add']"
+          >新增</el-button>
           <el-button
             size="mini"
             type="text"
@@ -126,37 +87,26 @@
         </template>
       </el-table-column>
     </el-table>
-    
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <!--     
+        <pagination
+          v-show="total>0"
+          :total="total"
+          :page.sync="queryParams.pageNum"
+          :limit.sync="queryParams.pageSize"
+          @pagination="getList"
+        /> -->
 
     <!-- 添加或修改行业分类对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="父id" prop="parentId">
-          <el-input v-model="form.parentId" placeholder="请输入父id" />
+        <el-form-item label="上级行业" v-if="addPrename" prop="parentId">
+          <el-input v-model="addPrename" disabled="true" placeholder="" />
         </el-form-item>
         <el-form-item label="行业名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入行业名称" />
         </el-form-item>
         <el-form-item label="行业代码" prop="code">
           <el-input v-model="form.code" placeholder="请输入行业代码" />
-        </el-form-item>
-        <el-form-item label="级别 1，2，3" prop="level">
-          <el-input v-model="form.level" placeholder="请输入级别 1，2，3" />
-        </el-form-item>
-        <el-form-item label="状态1-启用,2-不启用">
-          <el-radio-group v-model="form.status">
-            <el-radio label="1">请选择字典生成</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除标志" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -168,7 +118,7 @@
 </template>
 
 <script>
-import { listBusinessCategory, getBusinessCategory, delBusinessCategory, addBusinessCategory, updateBusinessCategory, exportBusinessCategory } from "@/api/map/businessCategory";
+import { listBusinessCategory, getpreBusinessCategory, getBusinessCategory, delBusinessCategory, addBusinessCategory, updateBusinessCategory, exportBusinessCategory } from "@/api/map/businessCategory";
 
 export default {
   name: "BusinessCategory",
@@ -190,6 +140,7 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      addPrename: '',
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -216,8 +167,8 @@ export default {
     getList() {
       this.loading = true;
       listBusinessCategory(this.queryParams).then(response => {
-        this.businessCategoryList = response.rows;
-        this.total = response.total;
+        this.businessCategoryList = response.data.root;
+        // this.total = response.total;
         this.loading = false;
       });
     },
@@ -234,7 +185,7 @@ export default {
         name: undefined,
         code: undefined,
         level: undefined,
-        status: "0",
+        status: "1",
         createTime: undefined,
         updateTime: undefined,
         updateBy: undefined,
@@ -260,8 +211,34 @@ export default {
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
-    handleAdd() {
+    handleAdd(val) {
       this.reset();
+      this.addPrename = ''
+      // 一级新增
+      if (!val) {
+        this.form.level = 1
+        this.form.subcode = -1
+      } else if (val && val.level === 1) {
+        // 二级新增
+        this.form.subcode = -1
+        this.form.level = 2
+      } else if (val && val.level === 2) {
+        // 三级新增
+        this.form.parentId = val.subcode
+        this.form.level = 3
+        this.addPrename = '789'
+      }
+      if (val && val.code) {
+        getpreBusinessCategory(this.form).then(response => {
+          if (response.code === 200) {
+              console.log(response)
+              this.addPrename = response.data.name
+          } else {
+            this.addPrename = ''
+            this.msgError(response.msg);
+          }
+        });
+      }
       this.open = true;
       this.title = "添加行业分类";
     },
