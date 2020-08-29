@@ -100,7 +100,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="上级行业" v-if="addPrename" prop="parentId">
-          <el-input v-model="addPrename" disabled="true" placeholder="" />
+          <el-input v-model="addPrename" disabled placeholder="" />
         </el-form-item>
         <el-form-item label="行业名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入行业名称" />
@@ -185,7 +185,7 @@ export default {
         name: undefined,
         code: undefined,
         level: undefined,
-        status: "1",
+        status: undefined,
         createTime: undefined,
         updateTime: undefined,
         updateBy: undefined,
@@ -213,26 +213,35 @@ export default {
     /** 新增按钮操作 */
     handleAdd(val) {
       this.reset();
-      this.addPrename = ''
+      this.addPrename = undefined
+      console.log('asda', val);
+
       // 一级新增
-      if (!val) {
+      if (val && !val.level) {
         this.form.level = 1
-        this.form.subcode = -1
+        this.form.subCode = -1
       } else if (val && val.level === 1) {
         // 二级新增
-        this.form.subcode = -1
+        this.form.subCode = val.code
         this.form.level = 2
+        this.addPrename = undefined
       } else if (val && val.level === 2) {
         // 三级新增
-        this.form.parentId = val.subcode
+        this.form.subCode = val.code
         this.form.level = 3
-        this.addPrename = '789'
       }
       if (val && val.code) {
-        getpreBusinessCategory(this.form).then(response => {
+        getpreBusinessCategory(val.code).then(response => {
           if (response.code === 200) {
-              console.log(response)
-              this.addPrename = response.data.name
+            if (val.level === 2) {
+                getpreBusinessCategory(response.data.subCode).then(response => {
+                  if (response.code === 200) {
+                    this.addPrename = response.data.name
+                  } else {
+                    this.msgError(response.msg);
+                  }
+                })
+            }
           } else {
             this.addPrename = ''
             this.msgError(response.msg);
@@ -246,6 +255,19 @@ export default {
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
+      console.log(row);
+      if (row.level === 1) {
+        this.addPrename = ''
+      }
+      if (row.level === 2 || row.level === 3) {
+        getpreBusinessCategory(row.subCode).then(response => {
+          if (response.code === 200) {
+            this.addPrename = response.data.name
+          } else {
+            this.msgError(response.msg);
+          }
+        })
+      }
       getBusinessCategory(id).then(response => {
         this.form = response.data;
         this.open = true;
