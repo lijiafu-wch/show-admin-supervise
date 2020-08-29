@@ -77,14 +77,14 @@
           @click="handleDelete"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
+<!--      <el-col :span="1.5">
         <el-button
           type="info"
           icon="el-icon-upload2"
           size="mini"
           @click="handleImport"
         >导入</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button
           v-hasPermi="['map:certificate:export']"

@@ -48,7 +48,7 @@
               v-hasPermi="['map:areaInfo:remove']"
             >删除</el-button>
           </el-col>
-          <el-col :span="1.5">
+<!--          <el-col :span="1.5">
             <el-button
               type="warning"
               icon="el-icon-download"
@@ -56,7 +56,7 @@
               @click="handleExport"
               v-hasPermi="['map:areaInfo:export']"
             >导出</el-button>
-          </el-col>
+          </el-col> -->
         </el-row>
         <el-table v-loading="loading" :data="areaInfoList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center" />

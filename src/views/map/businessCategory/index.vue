@@ -45,7 +45,7 @@
           v-hasPermi="['map:businessCategory:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="warning"
           icon="el-icon-download"
@@ -53,7 +53,7 @@
           @click="handleExport"
           v-hasPermi="['map:businessCategory:export']"
         >导出</el-button>
-      </el-col>
+      </el-col> -->
     </el-row>
 
     <el-table v-loading="loading" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" row-key="id" :data="businessCategoryList" @selection-change="handleSelectionChange">
