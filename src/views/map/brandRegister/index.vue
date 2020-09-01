@@ -217,7 +217,7 @@
     />
 
     <!-- 添加或修改商标注册对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="所属商家" prop="merchant">
           <el-select

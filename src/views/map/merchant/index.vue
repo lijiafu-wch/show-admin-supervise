@@ -418,7 +418,7 @@
             <em>点击上传</em>
           </div>
           <div slot="tip" class="el-upload__tip">
-            <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据
+            <!-- <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据 -->
             <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
           </div>
           <div slot="tip" class="el-upload__tip" style="color:red">提示：仅允许导入“xls”或“xlsx”格式文件！</div>

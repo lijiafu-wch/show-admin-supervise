@@ -144,19 +144,19 @@
     />
 
     <!-- 添加或修改商圈对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="50%" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="40%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="商圈名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入商圈名称" />
+          <el-input v-model="form.name" placeholder="请输入商圈名称" style="width: 300px;"/>
         </el-form-item>
         <el-form-item label="详细地址" prop="address">
-          <el-input v-model="form.address" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.address" type="textarea" placeholder="请输入内容" style="width: 300px;"/>
         </el-form-item>
         <el-form-item label="经度" prop="longitude">
-          <el-input v-model="form.longitude" placeholder="请输入经度" />
+          <el-input v-model="form.longitude" placeholder="请输入经度" style="width: 100px;"/>
         </el-form-item>
         <el-form-item label="纬度" prop="latitude">
-          <el-input v-model="form.latitude" placeholder="请输入纬度" />
+          <el-input v-model="form.latitude" placeholder="请输入纬度" style="width: 100px;"/>
         </el-form-item>
         <el-form-item label="图片" prop="picture">
           <el-upload
@@ -170,7 +170,7 @@
             :file-list="fileList"
             list-type="picture">
             <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件<!-- ，且不超过500kb --></div>
           </el-upload>
           <!-- <el-input v-model="form.picture" placeholder="请输入图片" /> -->
         </el-form-item>
@@ -179,7 +179,7 @@
           <!-- <el-input v-model="form.detal" type="textarea" placeholder="请输入内容" /> -->
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer" style="margin-top: 20px;">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
@@ -264,7 +264,7 @@ export default {
       }
       console.log(fileList, this.form)
     },
-    
+
     /** 查询商圈列表 */
     getList() {
       this.loading = true
