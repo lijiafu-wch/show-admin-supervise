@@ -293,7 +293,8 @@
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>详细地址</div>
-            <el-input v-model="form.address" style="width: 33.3%" class="ib info_border_r" placeholder="请输入内容" />
+            <el-input v-model="form.address" style="width: 33.3%" class="ib" placeholder="请输入内容" />
+            <i @click="getMap" class="el-icon-location-information info_th info_border_r" style="padding: 10px 5px;cursor: pointer;"></i>
             <div style="width: 12.5%" class="info_th ib info_border_r">经度</div>
             <el-input v-model="form.longitude" style="width: 12.5%" class="info_border_r" placeholder="请输入内容" />
             <div style="width: 12.5%" class="info_th ib info_border_r">纬度</div>
@@ -427,25 +428,22 @@
           <el-button @click="upload.open = false">取 消</el-button>
         </div>
       </el-dialog>
-      <el-dialog :title="title" :visible.sync="showMap" width="80%" append-to-body>
-        <!-- <div v-if="showMap"> -->
+      <el-dialog :title="'定位'" :visible.sync="showMap" width="80%" append-to-body>
         <iframe
-          src="/html/tc.html"
+          src="/html/map.html"
           frameborder="0"
-          style="position: fixed;
-        top: 25%;
-        width: 80%;
-        height: 80%;
-        z-index: 25;
-        margin-top: 0px;
-        margin-right: 10px;
-        margin-left: 10px;
-        margin-bottom: 10px;"
-        />
-        <!-- </div> -->
+          style="
+          width: 100%;
+          height: 500px;
+          z-index: 25;
+          margin-top: 0px;
+          margin-right: 10px;
+          margin-left: 10px;
+          margin-bottom: 10px;"
+          />
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
+          <el-button @click="cancelmap">取 消</el-button>
         </div>
       </el-dialog>
     </div>
@@ -597,6 +595,12 @@ export default {
     window.addEventListener('message', this.hendMessage)
   },
   methods: {
+    getMap () {
+      this.showMap = true
+    },
+    cancelmap () {
+      this.showMap = false
+    },
     // 商圈查询赋值
     getlistBusinessRound() {
       listBusinessRound()
@@ -977,10 +981,6 @@ export default {
       }).then(response => {
         this.download(response.msg)
       }).catch(function() {})
-    },
-    /** 地图操作 */
-    handleAdd1() {
-      this.showMap = true
     }
   }
 }
