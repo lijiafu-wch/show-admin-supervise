@@ -292,8 +292,8 @@
             />
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
-            <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>详细地址</div>
-            <el-input v-model="form.address" style="width: 33.3%" class="ib" placeholder="请输入内容" />
+            <div style="width: 17%" class="info_th ib info_border_r"><span class="must">*</span>详细地址</div>
+            <el-input v-model="form.address" style="width: 31%" class="ib" placeholder="请输入内容" />
             <i @click="getMap" class="el-icon-location-information info_th info_border_r" style="padding: 10px 5px;cursor: pointer;"></i>
             <div style="width: 12.5%" class="info_th ib info_border_r">经度</div>
             <el-input v-model="form.longitude" style="width: 12.5%" class="info_border_r" placeholder="请输入内容" />
@@ -432,8 +432,8 @@
         <iframe
           src="/html/map.html"
           frameborder="0"
-          style="
-          width: 100%;
+          ref="iframe"
+          style="width: 100%;
           height: 500px;
           z-index: 25;
           margin-top: 0px;
@@ -442,7 +442,7 @@
           margin-bottom: 10px;"
           />
         <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button type="primary" @click="submitMap">确 定</el-button>
           <el-button @click="cancelmap">取 消</el-button>
         </div>
       </el-dialog>
@@ -560,6 +560,7 @@ export default {
       currentId: '',
       // 表单参数
       form: {},
+      mapCenter: '',
       // 表单校验
       rules: {
       },
@@ -599,6 +600,15 @@ export default {
       this.showMap = true
     },
     cancelmap () {
+      this.mapCenter = ''
+      this.showMap = false
+    },
+    submitMap () {
+      if (!this.mapCenter) {
+        return
+      }
+      this.form.longitude = this.mapCenter.result.split(',')[0]
+      this.form.latitude = this.mapCenter.result.split(',')[1]
       this.showMap = false
     },
     // 商圈查询赋值
@@ -796,7 +806,8 @@ export default {
     },
     hendMessage(event) {
       const data = event.data
-      console.log('接收到参数：' + data.result)
+      console.log(data);
+      this.mapCenter = data
     },
     /** 查询商家信息列表 */
     getList() {
