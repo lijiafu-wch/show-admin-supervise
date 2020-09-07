@@ -1,8 +1,10 @@
 <template>
   <div class="app-container">
-    <el-tree class="treelist" node-key="id" :default-expanded-keys="[1]" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
-    <div class="treeline" />
-    <div class="treeGrid">
+    <el-tree class="treelist" v-show="treeFlag" node-key="id" :default-expanded-keys="[1]" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
+    <i class="el-icon-s-unfold" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="!treeFlag"></i>
+    <i class="el-icon-s-fold" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="treeFlag"></i>
+    <div class="treeline" v-show="treeFlag" />
+    <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }" >
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
 
         <el-form-item label="企业名称" prop="name">
@@ -472,6 +474,7 @@ export default {
   },
   data() {
     return {
+      treeFlag: false,
       activeName: 'first',
       countyCode: [], // 街道假
       businessCategoryContent: [], // 分类假
@@ -610,6 +613,9 @@ export default {
       this.form.longitude = this.mapCenter.result.split(',')[0]
       this.form.latitude = this.mapCenter.result.split(',')[1]
       this.showMap = false
+    },
+    checkTree () {
+      this.treeFlag = !this.treeFlag
     },
     // 商圈查询赋值
     getlistBusinessRound() {
@@ -1046,6 +1052,9 @@ export default {
   .treeGrid {
     width: 90%;
     margin-left: 24px;
+  }
+  .treeGridclose {
+    width: 100%;
   }
   .treelist {
     width: 15%;

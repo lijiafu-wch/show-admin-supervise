@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-08-25 14:23:37
- * @LastEditTime: 2020-08-25 15:42:38
+ * @LastEditTime: 2020-09-07 19:44:28
  * @LastEditors: Please set LastEditors
  * @Description: 证书info
  * @FilePath: /show-admin-supervise/src/views/map/merchant/table_modules/certificateList.vue
@@ -29,13 +29,13 @@
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       </el-table>
-      <pagination
+      <!-- <pagination
         v-show="total>0"
         :total="total"
         :page.sync="queryParams.pageNum"
         :limit.sync="queryParams.pageSize"
         @pagination="getList"
-      />
+      /> -->
   </div>
 </template>
 
@@ -51,7 +51,7 @@ export default {
             loading: false,
             queryParams: {
                 pageNum: 1,
-                pageSize: 5
+                pageSize: 50
             },
             certificateOptions: [ ]
         }
