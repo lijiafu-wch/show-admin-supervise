@@ -77,14 +77,14 @@
           @click="handleDelete"
         >删除</el-button>
       </el-col>
-<!--      <el-col :span="1.5">
+     <el-col :span="1.5">
         <el-button
           type="info"
           icon="el-icon-upload2"
           size="mini"
           @click="handleImport"
         >导入</el-button>
-      </el-col> -->
+      </el-col>
       <el-col :span="1.5">
         <el-button
           v-hasPermi="['map:certificate:export']"
@@ -167,7 +167,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="关联证书" prop="cerCode">
-            
+
           <el-select style="width: 100%" v-model="form.cerCode" placeholder="关联证书" clearable size="small">
             <el-option
               v-for="dict in certificateOptions"
@@ -188,6 +188,9 @@
             value-format="yyyy-MM-dd"
             placeholder="选择有效期"
           />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -216,7 +219,7 @@
           <em>点击上传</em>
         </div>
         <div slot="tip" class="el-upload__tip">
-          <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据
+          <!-- <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据 -->
           <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
         </div>
         <div slot="tip" class="el-upload__tip" style="color:red">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
