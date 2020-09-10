@@ -6,7 +6,6 @@
     <div class="treeline" v-show="treeFlag" />
     <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }" >
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
-
         <el-form-item label="企业名称" prop="name">
           <el-input
             v-model="queryParams.name"
@@ -137,6 +136,22 @@
             @click="handleExport"
           >导出</el-button>
         </el-col>
+         <el-col :span="1.5">
+          <el-button
+            v-show="!ShowMore"
+            type="warning"
+            icon="el-icon-circle-plus-outline"
+            size="mini"
+            @click="handleShowMore"
+          >展示商圈明细</el-button>
+           <el-button
+            type="warning"
+            v-show="ShowMore"
+            icon="el-icon-remove-outline"
+            size="mini"
+            @click="handleShowMore"
+          >收起商圈明细</el-button>
+        </el-col>
       </el-row>
       <el-table v-loading="loading" :data="merchantList" @row-click="rowClick" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
@@ -226,7 +241,7 @@
         :limit.sync="queryParams.pageSize"
         @pagination="getList"
       />
-      <el-tabs v-model="activeName" style="margin-top: 24px" @tab-click="handleClick">
+      <el-tabs v-show="ShowMore" v-model="activeName" style="margin-top: 24px" @tab-click="handleClick">
         <el-tab-pane label="证书管理" name="first">
           <certificateList ref="certificateList" />
         </el-tab-pane>
@@ -475,6 +490,7 @@ export default {
   data() {
     return {
       treeFlag: false,
+      ShowMore: false,
       activeName: 'first',
       countyCode: [], // 街道假
       businessCategoryContent: [], // 分类假
@@ -530,7 +546,7 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 10,
         businessRoundId: undefined,
         name: undefined,
         creditCode: undefined,
@@ -613,6 +629,9 @@ export default {
       this.form.longitude = this.mapCenter.result.split(',')[0]
       this.form.latitude = this.mapCenter.result.split(',')[1]
       this.showMap = false
+    },
+    handleShowMore () {
+      this.ShowMore = !this.ShowMore
     },
     checkTree () {
       this.treeFlag = !this.treeFlag
