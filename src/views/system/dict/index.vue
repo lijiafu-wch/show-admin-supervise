@@ -11,7 +11,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="字典类型" prop="dictType">
+      <!-- <el-form-item label="字典类型" prop="dictType">
         <el-input
           v-model="queryParams.dictType"
           placeholder="请输入字典类型"
@@ -20,7 +20,7 @@
           style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="状态" prop="status">
         <el-select
           v-model="queryParams.status"
@@ -100,13 +100,13 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="字典编号" align="center" prop="dictId" />
       <el-table-column label="字典名称" align="center" prop="dictName" :show-overflow-tooltip="true" />
-      <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
+      <!-- <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
         <template slot-scope="scope">
           <router-link :to="'/dict/type/data/' + scope.row.dictId" class="link-type">
             <span>{{ scope.row.dictType }}</span>
           </router-link>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat" />
       <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -148,9 +148,9 @@
         <el-form-item label="字典名称" prop="dictName">
           <el-input v-model="form.dictName" placeholder="请输入字典名称" />
         </el-form-item>
-        <el-form-item label="字典类型" prop="dictType">
+        <!-- <el-form-item label="字典类型" prop="dictType">
           <el-input v-model="form.dictType" placeholder="请输入字典类型" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="form.status">
             <el-radio
@@ -213,10 +213,10 @@ export default {
       rules: {
         dictName: [
           { required: true, message: "字典名称不能为空", trigger: "blur" }
-        ],
-        dictType: [
-          { required: true, message: "字典类型不能为空", trigger: "blur" }
         ]
+        // dictType: [
+        //   { required: true, message: "字典类型不能为空", trigger: "blur" }
+        // ]
       }
     };
   },
@@ -251,7 +251,7 @@ export default {
       this.form = {
         dictId: undefined,
         dictName: undefined,
-        dictType: undefined,
+        dictType: 'mapOptions',
         status: "0",
         remark: undefined
       };
@@ -292,6 +292,7 @@ export default {
     },
     /** 提交按钮 */
     submitForm: function() {
+      this.form.dictType = 'mapOptions'
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.dictId != undefined) {

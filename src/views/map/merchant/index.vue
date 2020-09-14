@@ -6,7 +6,6 @@
     <div class="treeline" v-show="treeFlag" />
     <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }" >
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
-
         <el-form-item label="企业名称" prop="name">
           <el-input
             v-model="queryParams.name"
@@ -137,6 +136,22 @@
             @click="handleExport"
           >导出</el-button>
         </el-col>
+         <el-col :span="1.5">
+          <el-button
+            v-if="!ShowMore"
+            type="success"
+            icon="el-icon-circle-plus-outline"
+            size="mini"
+            @click="handleShowMore"
+          >展示商圈明细</el-button>
+           <el-button
+            type="success"
+            v-if="ShowMore"
+            icon="el-icon-remove-outline"
+            size="mini"
+            @click="handleShowMore"
+          >收起商圈明细</el-button>
+        </el-col>
       </el-row>
       <el-table v-loading="loading" :data="merchantList" @row-click="rowClick" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
@@ -226,7 +241,7 @@
         :limit.sync="queryParams.pageSize"
         @pagination="getList"
       />
-      <el-tabs v-model="activeName" style="margin-top: 24px" @tab-click="handleClick">
+      <el-tabs v-show="ShowMore" v-model="activeName" style="margin-top: 24px" @tab-click="handleClick">
         <el-tab-pane label="证书管理" name="first">
           <certificateList ref="certificateList" />
         </el-tab-pane>
@@ -288,6 +303,7 @@
               v-model="countyCode"
               style="width: 83.4%"
               placeholder="选择区县、街道、社区"
+              :props="{ checkStrictly: true }"
               clearable
               :options="treeData"
               @change="selCounty"
@@ -453,7 +469,7 @@
 </template>
 
 <script>
-import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate } from '@/api/map/merchant'
+import { listMerchant, getMerchant, delMerchant, disCode, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate } from '@/api/map/merchant'
 import { allDistrict } from '@/api/map/district'
 import { listBusinessRound } from '@/api/map/businessRound'
 import { listBusinessCategory } from '@/api/map/businessCategory'
@@ -475,6 +491,7 @@ export default {
   data() {
     return {
       treeFlag: false,
+      ShowMore: false,
       activeName: 'first',
       countyCode: [], // 街道假
       businessCategoryContent: [], // 分类假
@@ -530,7 +547,7 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 5,
+        pageSize: 10,
         businessRoundId: undefined,
         name: undefined,
         creditCode: undefined,
@@ -614,6 +631,9 @@ export default {
       this.form.latitude = this.mapCenter.result.split(',')[1]
       this.showMap = false
     },
+    handleShowMore () {
+      this.ShowMore = !this.ShowMore
+    },
     checkTree () {
       this.treeFlag = !this.treeFlag
     },
@@ -644,6 +664,7 @@ export default {
     // 选择新增区县赋值
     selCounty(val) {
       if (!val) return
+      console.log(this.countyCode);
       this.form.countyCode = val[1]
       this.form.streetCode = val[2]
       this.form.communityCode = val[3]
@@ -924,6 +945,15 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset()
+      if (this.queryParams.countyCode || this.queryParams.streetCode || this.queryParams.communityCode) {
+        disCode(this.queryParams.countyCode || this.queryParams.streetCode || this.queryParams.communityCode).then(response => {
+          console.log(response);
+          this.countyCode = [undefined, response.data.oneCode || undefined, response.data.twoCode || undefined, response.data.threeCode || undefined]
+        })
+      }
+      // console.log(this.queryParams.countyCode,
+      //     this.queryParams.streetCode,
+      //     this.queryParams.communityCode);
       this.open = true
       this.title = '添加商家信息'
     },
