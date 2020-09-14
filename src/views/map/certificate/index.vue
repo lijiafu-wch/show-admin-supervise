@@ -2,21 +2,22 @@
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="所属商家" prop="merchant">
-         <el-select
-            v-model="queryParams.merchant"
-            filterable
-            remote
-            reserve-keyword
-            placeholder="请输入商家名称"
-            :remote-method="remoteMethod"
-            :loading="loading">
-            <el-option
-              v-for="item in options"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
+        <el-select
+          v-model="queryParams.merchant"
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入商家名称"
+          :remote-method="remoteMethod"
+          :loading="loading"
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="关联证书" prop="cerCode">
         <el-select v-model="queryParams.cerCode" placeholder="全部">
@@ -77,7 +78,7 @@
           @click="handleDelete"
         >删除</el-button>
       </el-col>
-     <el-col :span="1.5">
+      <el-col :span="1.5">
         <el-button
           type="info"
           icon="el-icon-upload2"
@@ -94,15 +95,15 @@
           @click="handleExport"
         >导出</el-button>
       </el-col>
-	  <el-col :span="1.5">
-	    <el-button
-	      v-hasPermi="['map:certificate:export']"
-	      type="danger"
-	      icon="el-icon-download"
-	      size="mini"
-	      @click="handleExport"
-	    >过期预警</el-button>
-	  </el-col>
+      <el-col :span="1.5">
+        <el-button
+          v-hasPermi="['map:certificate:export']"
+          type="danger"
+          icon="el-icon-download"
+          size="mini"
+          @click="warningList"
+        >过期预警</el-button>
+      </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="certificateList" @selection-change="handleSelectionChange">
@@ -158,7 +159,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="所属商家" prop="merchant">
-           <el-select
+          <el-select
             v-model="form.merchant"
             filterable
             remote
@@ -166,18 +167,19 @@
             style="width: 100%"
             placeholder="请输入商家名称"
             :remote-method="remoteMethod"
-            :loading="loading">
+            :loading="loading"
+          >
             <el-option
               v-for="item in options"
               :key="item.id"
               :label="item.name"
-              :value="item.id">
-            </el-option>
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="关联证书" prop="cerCode">
 
-          <el-select style="width: 100%" v-model="form.cerCode" placeholder="关联证书" clearable size="small">
+          <el-select v-model="form.cerCode" style="width: 100%" placeholder="关联证书" clearable size="small">
             <el-option
               v-for="dict in certificateOptions"
               :key="dict.dictValue"
@@ -310,13 +312,13 @@ export default {
     })
   },
   methods: {
-    remoteMethod (val) {
-      console.log(val);
+    remoteMethod(val) {
+      console.log(val)
       listMerchant(
         { name: val }
       ).then(response => {
-          console.log(val);
-          this.options = response.rows
+        console.log(val)
+        this.options = response.rows
       })
     },
     /** 查询证件信息列表 */
@@ -430,7 +432,7 @@ export default {
       }).catch(function() {})
     },
     /** 过期预警 */
-    warning() {
+    warningList() {
       this.dateRange = []
       this.resetForm('queryForm')
       this.queryParams.pageNum = 1
