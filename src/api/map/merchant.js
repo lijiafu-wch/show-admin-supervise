@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-08-23 09:00:10
+ * @LastEditTime: 2020-09-14 13:40:01
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /show-admin-supervise/src/api/map/merchant.js
+ */
 import request from '@/utils/request'
 
 // 查询商家信息列表
@@ -56,6 +64,14 @@ export function exportMerchant(query) {
 export function merchantimportTemplate() {
   return request({
     url: 'map/merchant/importTemplate',
+    method: 'get'
+  })
+}
+
+// 下载导入模板
+export function disCode(code) {
+  return request({
+    url: 'map/district/code/' + code,
     method: 'get'
   })
 }

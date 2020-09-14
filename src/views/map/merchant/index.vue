@@ -138,15 +138,15 @@
         </el-col>
          <el-col :span="1.5">
           <el-button
-            v-show="!ShowMore"
-            type="warning"
+            v-if="!ShowMore"
+            type="success"
             icon="el-icon-circle-plus-outline"
             size="mini"
             @click="handleShowMore"
           >展示商圈明细</el-button>
            <el-button
-            type="warning"
-            v-show="ShowMore"
+            type="success"
+            v-if="ShowMore"
             icon="el-icon-remove-outline"
             size="mini"
             @click="handleShowMore"
@@ -303,6 +303,7 @@
               v-model="countyCode"
               style="width: 83.4%"
               placeholder="选择区县、街道、社区"
+              :props="{ checkStrictly: true }"
               clearable
               :options="treeData"
               @change="selCounty"
@@ -468,7 +469,7 @@
 </template>
 
 <script>
-import { listMerchant, getMerchant, delMerchant, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate } from '@/api/map/merchant'
+import { listMerchant, getMerchant, delMerchant, disCode, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate } from '@/api/map/merchant'
 import { allDistrict } from '@/api/map/district'
 import { listBusinessRound } from '@/api/map/businessRound'
 import { listBusinessCategory } from '@/api/map/businessCategory'
@@ -663,6 +664,7 @@ export default {
     // 选择新增区县赋值
     selCounty(val) {
       if (!val) return
+      console.log(this.countyCode);
       this.form.countyCode = val[1]
       this.form.streetCode = val[2]
       this.form.communityCode = val[3]
@@ -943,6 +945,15 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset()
+      if (this.queryParams.countyCode || this.queryParams.streetCode || this.queryParams.communityCode) {
+        disCode(this.queryParams.countyCode || this.queryParams.streetCode || this.queryParams.communityCode).then(response => {
+          console.log(response);
+          this.countyCode = [undefined, response.data.oneCode || undefined, response.data.twoCode || undefined, response.data.threeCode || undefined]
+        })
+      }
+      // console.log(this.queryParams.countyCode,
+      //     this.queryParams.streetCode,
+      //     this.queryParams.communityCode);
       this.open = true
       this.title = '添加商家信息'
     },
