@@ -51,3 +51,11 @@ export function exportMeasureAappliance(query) {
     params: query
   })
 }
+
+// 下载导入模板
+export function importTemplate() {
+  return request({
+    url: '/map/measureAappliance/importTemplate',
+    method: 'get'
+  })
+}

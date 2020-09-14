@@ -9,6 +9,15 @@ export function listCertificate(query) {
   })
 }
 
+// 查询预警证件信息列表
+export function listWarning() {
+  return request({
+    url: '/map/certificate/warning',
+    method: 'get'
+  })
+}
+
+
 // 查询证件信息详细
 export function getCertificate(id) {
   return request({

@@ -2,21 +2,22 @@
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="所属商家" prop="merchant">
-       <el-select
-            v-model="queryParams.merchant"
-            filterable
-            remote
-            reserve-keyword
-            placeholder="请输入商家名称"
-            :remote-method="remoteMethod"
-            :loading="loading">
-            <el-option
-              v-for="item in options"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
+        <el-select
+          v-model="queryParams.merchant"
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入商家名称"
+          :remote-method="remoteMethod"
+          :loading="loading"
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="名称" prop="name">
         <el-input
@@ -77,6 +78,14 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
+          type="info"
+          icon="el-icon-upload2"
+          size="mini"
+          @click="handleImport"
+        >导入</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
           v-hasPermi="['map:measureAappliance:export']"
           type="warning"
           icon="el-icon-download"
@@ -101,14 +110,14 @@
         :show-overflow-tooltip="true"
       />
       <el-table-column label="型号" align="center" prop="model" />
-   <!--   <el-table-column
+      <!--   <el-table-column
         label="生产厂家"
         align="center"
         prop="factoryName"
         :show-overflow-tooltip="true"
       /> -->
       <el-table-column label="出厂编号" align="center" prop="leaveNo" />
-     <!-- <el-table-column
+      <!-- <el-table-column
         label="用途"
         align="center"
         prop="purpose"
@@ -166,13 +175,14 @@
             style="width: 100%"
             placeholder="请输入商家名称"
             :remote-method="remoteMethod"
-            :loading="loading">
+            :loading="loading"
+          >
             <el-option
               v-for="item in options"
               :key="item.id"
               :label="item.name"
-              :value="item.id">
-            </el-option>
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="名称" prop="name">
@@ -187,7 +197,7 @@
         <el-form-item label="出厂编号" prop="leaveNo">
           <el-input v-model="form.leaveNo" placeholder="请输入出厂编号" />
         </el-form-item>
-      <!--  <el-form-item label="用途" prop="purpose">
+        <!--  <el-form-item label="用途" prop="purpose">
           <el-input v-model="form.purpose" placeholder="请输入用途" />
         </el-form-item>
         <el-form-item label="检定情况" prop="checkCase">
@@ -213,13 +223,45 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 用户导入对话框 -->
+    <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
+      <el-upload
+        ref="upload"
+        :limit="1"
+        accept=".xlsx, .xls"
+        :headers="upload.headers"
+        :action="upload.url + '?updateSupport=' + upload.updateSupport"
+        :disabled="upload.isUploading"
+        :on-progress="handleFileUploadProgress"
+        :on-success="handleFileSuccess"
+        :auto-upload="false"
+        drag
+      >
+        <i class="el-icon-upload" />
+        <div class="el-upload__text">
+          将文件拖到此处，或
+          <em>点击上传</em>
+        </div>
+        <div slot="tip" class="el-upload__tip">
+          <!-- <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据 -->
+          <el-link type="info" style="font-size:12px;color: #1890ff;" @click="importTemplate">下载模板</el-link>
+        </div>
+        <div slot="tip" class="el-upload__tip" style="color:red">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
+      </el-upload>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFileForm">确 定</el-button>
+        <el-button @click="upload.open = false">取 消</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-import { listMeasureAappliance, getMeasureAappliance, delMeasureAappliance, addMeasureAappliance, updateMeasureAappliance, exportMeasureAappliance } from '@/api/map/measureAappliance'
+import { listMeasureAappliance, getMeasureAappliance, delMeasureAappliance, addMeasureAappliance, updateMeasureAappliance, exportMeasureAappliance, importTemplate } from '@/api/map/measureAappliance'
 import { listMerchant } from '@/api/map/merchant'
-
+import { getToken } from '@/utils/auth'
 export default {
   name: 'MeasureAappliance',
   data() {
@@ -243,6 +285,21 @@ export default {
       open: false,
       // 日期范围
       dateRange: [],
+      // 导入参数
+      upload: {
+        // 是否显示弹出层（导入）
+        open: false,
+        // 弹出层标题（导入）
+        title: '',
+        // 是否禁用上传
+        isUploading: false,
+        // 是否更新已经存在的数据
+        updateSupport: 0,
+        // 设置上传的请求头部
+        headers: { Authorization: 'Bearer ' + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + '/map/measureAappliance/importData'
+      },
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -269,13 +326,13 @@ export default {
     this.getList()
   },
   methods: {
-    remoteMethod (val) {
-      console.log(val);
+    remoteMethod(val) {
+      console.log(val)
       listMerchant(
         { name: val }
       ).then(response => {
-          console.log(val);
-          this.options = response.rows
+        console.log(val)
+        this.options = response.rows
       })
     },
     /** 查询计量器具列表 */
@@ -401,6 +458,33 @@ export default {
       }).then(response => {
         this.download(response.msg)
       }).catch(function() {})
+    },
+    /** 导入按钮操作 */
+    handleImport() {
+      this.upload.title = '用户导入'
+      this.upload.open = true
+    },
+    /** 下载模板操作 */
+    importTemplate() {
+      importTemplate().then(response => {
+        this.download(response.msg)
+      })
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      this.upload.open = false
+      this.upload.isUploading = false
+      this.$refs.upload.clearFiles()
+      this.$alert(response.msg, '导入结果', { dangerouslyUseHTMLString: true })
+      this.getList()
+    },
+    // 提交上传文件
+    submitFileForm() {
+      this.$refs.upload.submit()
     }
   }
 }

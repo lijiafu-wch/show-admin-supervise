@@ -94,6 +94,15 @@
           @click="handleExport"
         >导出</el-button>
       </el-col>
+	  <el-col :span="1.5">
+	    <el-button
+	      v-hasPermi="['map:certificate:export']"
+	      type="danger"
+	      icon="el-icon-download"
+	      size="mini"
+	      @click="handleExport"
+	    >过期预警</el-button>
+	  </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="certificateList" @selection-change="handleSelectionChange">
@@ -220,7 +229,7 @@
         </div>
         <div slot="tip" class="el-upload__tip">
           <!-- <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据 -->
-          <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
+          <el-link type="info" style="font-size:12px;color: #1890ff;" @click="importTemplate">下载模板</el-link>
         </div>
         <div slot="tip" class="el-upload__tip" style="color:red">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
       </el-upload>
@@ -233,7 +242,7 @@
 </template>
 
 <script>
-import { listCertificate, getCertificate, delCertificate, addCertificate, updateCertificate, exportCertificate, importTemplate } from '@/api/map/certificate'
+import { listCertificate, getCertificate, delCertificate, addCertificate, updateCertificate, exportCertificate, importTemplate, listWarning } from '@/api/map/certificate'
 import { getToken } from '@/utils/auth'
 import { listMerchant } from '@/api/map/merchant'
 
@@ -419,6 +428,18 @@ export default {
         this.getList()
         this.msgSuccess('删除成功')
       }).catch(function() {})
+    },
+    /** 过期预警 */
+    warning() {
+      this.dateRange = []
+      this.resetForm('queryForm')
+      this.queryParams.pageNum = 1
+      this.loading = true
+      listWarning().then(response => {
+        this.certificateList = response.rows
+        this.total = response.total
+        this.loading = false
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
