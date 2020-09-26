@@ -10,9 +10,9 @@
         软件下载地址 http://www.bigemap.com/reader/download/detail201802017.html
     -->
 
-<link href='http://39.105.207.77:9000/bigemap.js/v2.1.0/bigemap.css' rel='stylesheet' />
+<link href='http://www.bigemap.com:9000/bigemap.js/v2.1.0/bigemap.css' rel='stylesheet' />
 <link href="https://cdn.bootcss.com/Buttons/2.0.0/css/buttons.min.css" rel="stylesheet">
-<script src='http://39.105.207.77:9000/bigemap.js/v2.1.0/bigemap.js'></script>
+<script src='http://www.bigemap.com:9000/bigemap.js/v2.1.0/bigemap.js'></script>
 <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/d3/5.16.0/d3.min.js"></script>
@@ -172,7 +172,9 @@ input:focus {
   <a href="/">取消</a>
 </div>
 <script type="text/javascript">// 软件配置信息地址，软件安装完成之后使用本地地址，如：http://localhost:9000
-        BM.Config.HTTP_URL = 'http://39.105.207.77:9000';
+        BM.Config.HTTP_URL = 'http://www.bigemap.com:9000';
+        // BM.Config.HTTP_URL = 'http://www.bigemap.com:9000';
+        
         // 在ID为map的元素中实例化一个地图，不要设置地图ID，ID号程序自动生成，无需手动配置，并设置地图的投影为百度地图 ，中心点，默认的级别和显示级别控件
         var map = BM.map('map', 'bigemap.googlemapen-satellite', {center: [ 45.7521,131.0256], zoom: 12, zoomControl: true,attributionControl:false});
         var locationMarker = null;
@@ -196,64 +198,61 @@ input:focus {
 	//      e.layer.setStyle({color: 'white',fillColor:'#ff0000',weight:1,fillOpacity:0.3});
 	//  }).addTo(map);
 
-//-----------------------------
-
-    //创建一个谷歌卫星图层 ，具体API详情请参见 ：http://www.bigemap.com/offlinemaps/api/#tilelayer
-    var google_satellite=BM.tileLayer('bigemap.googlemapen-satellite');
+    var google_satellite=BM.tileLayer('bigemap.googlemap-satellite');
     google_satellite.addTo(map);
-    //创建百度地图图层
-     var google_street=BM.tileLayer('bigemap.googlemap-streets');
-     google_street.addTo(map);
-
-     //创建天地图路网图层
-    var tian_satellitestreets = BM.tileLayer('bigemap.tian-satellitestreets');
+    var google_street=BM.tileLayer('bigemap.googlemap-streets');
     document.getElementById('satellite').addEventListener('click',function () {
         //先移除一个图层 ，再添加一个图层
         google_satellite.addTo(map);
-        tian_satellitestreets.addTo(map);
-       google_street.remove(map);
+        google_street.remove(map);
     });
 
     document.getElementById('street').addEventListener('click',function () {
         google_satellite.remove(map);
-         tian_satellitestreets.remove(map);
         google_street.addTo(map);
     });
 
 	//点击地图查询坐标信息
-    map.on('click',function (e) {
-	// alert(e.latlng.lng);
-    // alert(e.latlng.lat);
-    // BM.marker(e.latlng).addTo(this);
-    var lng=(e.latlng.lng+180)%360+360;
-    var lat=(e.latlng.lat+180)%360+360;
-    // $('#input').val([lng%360-180,e.latlng.lat].map(v=>v.toFixed(6)).join(','));
-    });
-    //创建一个标注，并设置坐标为当前地图的中心,详细API请参见 http://www.bigemap.com/offlinemaps/api/#marker
-    var marker=BM.marker(map.getCenter(),{draggable:true}).addTo(map);
-    //添加一个单击事件。事件列表请参见 ：http://www.bigemap.com/offlinemaps/api/#marker-dragstart
-    marker.on('move',function (e) {
-        // let lng=(e.latlng.lng+180)%360+360;
-        // let lat=(e.latlng.lat+180)%360+360;
-        console.log(e);
+    // map.on('click',function (e) {
+	// // alert(e.latlng.lng);
+    // // alert(e.latlng.lat);
+    // // BM.marker(e.latlng).addTo(this);
+    // var lng=(e.latlng.lng+180)%360+360;
+    // var lat=(e.latlng.lat+180)%360+360;
+    // // $('#input').val([lng%360-180,e.latlng.lat].map(v=>v.toFixed(6)).join(','));
+    // });
+    var marker
+    map.on('contextmenu',function(e){
+        if ($('.bigemap-marker-pane img').length > 1) {
+            $('.bigemap-marker-pane img')[0].remove()
+            $('.bigemap-marker-shadow')[0].remove()
+        }
+        marker = BM.marker(e.latlng,{draggable:true}).addTo(map);
+        marker.on('move',function (e) {
         window.parent.postMessage({
 	        result :  e.latlng.lng + ',' + e.latlng.lat
 	    },'*');
         // document.getElementById('position').innerHTML='lat:'+e.latlng.lat+',lng:'+e.latlng.lng;
     })
+    });
+    //创建一个标注，并设置坐标为当前地图的中心,详细API请参见 http://www.bigemap.com/offlinemaps/api/#marker
+    // var marker=BM.marker(map.getCenter(),{draggable:true}).addTo(map);
+    //添加一个单击事件。事件列表请参见 ：http://www.bigemap.com/offlinemaps/api/#marker-dragstart
+    
     $('#top_input').on('input', function () {
             let timer = $(this).data('timer');
             clearTimeout(timer);
             let val = $(this).val();
             timer = setTimeout(function () {
                 let center = map.getCenter();
-                $.get('https://restapi.amap.com/v3/assistant/inputtips?output=json&location=' + ([center.lng, center.lat].join(',')) + '&keywords=' + '七台河' + val + '&key=f290e69e458e618aead61401ee06b37e', function (data) {
+                console.log(val, center);
+
+                $.get('https://restapi.amap.com/v3/assistant/inputtips?output=json&location=' + ([center.lng, center.lat].join(',')) + '&keywords=七台河' + val + '&key=f290e69e458e618aead61401ee06b37e', function (data) {
                     let result = [], item;
                     if (data.tips) {
                         for (let i = 0; i < data.tips.length; i++) {
                             item = data.tips[i];
                             var itemtitle = item.name + item.district + item.address;
-                            console.log(item)
                             typeof item.location == 'string' && item.location ?
                                 result.push('<li>' +
                                     '<a  data-operation="location" data-location="' + item.location + '" data-title="' + itemtitle + '" href="javascript:void(0);"><i class="fa fa-map-marker"></i>&nbsp; ' + item.name + '</a></li>') : true;
@@ -279,9 +278,12 @@ input:focus {
                     if (location.length == 2) {
                         location = [parseFloat(location['1']), parseFloat(location['0'])];
                         if (!locationMarker) {
-                            let doc =  $('.bigemap-marker-pane img')[0].remove()
+                            if ($('.bigemap-marker-pane img').length > 1) {
+                                $('.bigemap-marker-pane img')[0].remove()
+                                $('.bigemap-marker-shadow')[0].remove()
+                            }
                             locationMarker = BM.marker(location, {draggable:true, autoPan: true}).addTo(map);
-                            locationMarker.bindTooltip(title, { direction: "top", parmanent: true })
+                            // locationMarker.bindTooltip(title, { direction: "top", parmanent: true })
                         } else {
                             locationMarker.setLatLng(location);
                         }
