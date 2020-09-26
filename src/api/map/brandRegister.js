@@ -51,3 +51,11 @@ export function exportBrandRegister(query) {
     params: query
   })
 }
+
+// 下载导入模板
+export function importTemplate() {
+  return request({
+    url: '/map/brandRegister/importTemplate',
+    method: 'get'
+  })
+}
