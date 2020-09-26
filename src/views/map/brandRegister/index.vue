@@ -327,12 +327,13 @@ export default {
   },
   created() {
     this.getList()
+    this.remoteMethod()
   },
   methods: {
     remoteMethod (val) {
       console.log(val);
       listMerchant(
-        { name: val }
+        { name: val || '' }
       ).then(response => {
           console.log(val);
           this.options = response.rows

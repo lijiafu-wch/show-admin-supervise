@@ -296,15 +296,15 @@ export default {
   },
   created() {
     this.getList()
+    this.remoteMethod()
     this.getDicts('map_certificate_options').then(response => {
       this.certificateOptions = response.data
     })
   },
   methods: {
     remoteMethod (val) {
-      console.log(val);
       listMerchant(
-        { name: val }
+        { name: val || ''}
       ).then(response => {
           console.log(val);
           this.options = response.rows

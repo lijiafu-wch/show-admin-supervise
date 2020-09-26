@@ -247,7 +247,7 @@ input:focus {
             let val = $(this).val();
             timer = setTimeout(function () {
                 let center = map.getCenter();
-                $.get('https://restapi.amap.com/v3/assistant/inputtips?output=json&location=' + ([center.lng, center.lat].join(',')) + '&keywords=' + val + '&key=f290e69e458e618aead61401ee06b37e', function (data) {
+                $.get('https://restapi.amap.com/v3/assistant/inputtips?output=json&location=' + ([center.lng, center.lat].join(',')) + '&keywords=' + '七台河' + val + '&key=f290e69e458e618aead61401ee06b37e', function (data) {
                     let result = [], item;
                     if (data.tips) {
                         for (let i = 0; i < data.tips.length; i++) {
