@@ -143,14 +143,14 @@
             icon="el-icon-circle-plus-outline"
             size="mini"
             @click="handleShowMore"
-          >展示商圈明细</el-button>
+          >展示证书明细</el-button>
            <el-button
             type="success"
             v-if="ShowMore"
             icon="el-icon-remove-outline"
             size="mini"
             @click="handleShowMore"
-          >收起商圈明细</el-button>
+          >收起证书明细</el-button>
         </el-col>
       </el-row>
       <el-table v-loading="loading" :data="merchantList" @row-click="rowClick" @selection-change="handleSelectionChange">
@@ -1005,7 +1005,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids
-      this.$confirm('是否确认删除商家信息编号为"' + ids + '"的数据项?', '警告', {
+      this.$confirm('是否确认删除商家信息编号为"' + ids + '"的数据项,同时会删除证书、商标和计量器具?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
