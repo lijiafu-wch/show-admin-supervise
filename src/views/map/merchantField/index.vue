@@ -19,20 +19,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态1-显示,2-部显示" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态1-显示,2-部显示" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="删除标志" prop="deleted">
-        <el-input
-          v-model="queryParams.deleted"
-          placeholder="请输入删除标志"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -69,7 +55,7 @@
           v-hasPermi="['map:merchantField:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
+ <!--     <el-col :span="1.5">
         <el-button
           type="warning"
           icon="el-icon-download"
@@ -77,16 +63,13 @@
           @click="handleExport"
           v-hasPermi="['map:merchantField:export']"
         >导出</el-button>
-      </el-col>
+      </el-col> -->
     </el-row>
 
     <el-table v-loading="loading" :data="merchantFieldList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="删除标志" align="center" prop="id" />
       <el-table-column label="字段标识" align="center" prop="filedFlag" />
       <el-table-column label="字段名称" align="center" prop="filedName" />
-      <el-table-column label="状态1-显示,2-部显示" align="center" prop="status" />
-      <el-table-column label="删除标志" align="center" prop="deleted" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -106,7 +89,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -123,14 +106,6 @@
         </el-form-item>
         <el-form-item label="字段名称" prop="filedName">
           <el-input v-model="form.filedName" placeholder="请输入字段名称" />
-        </el-form-item>
-        <el-form-item label="状态1-显示,2-部显示">
-          <el-radio-group v-model="form.status">
-            <el-radio label="1">请选择字典生成</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除标志" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
