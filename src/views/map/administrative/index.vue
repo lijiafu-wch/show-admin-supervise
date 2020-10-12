@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="行业名称" prop="name">
+      <el-form-item label="区域名称" prop="name">
         <el-input
           v-model="queryParams.name"
           placeholder="请输入行业名称"
@@ -16,7 +16,7 @@
       </el-form-item>
     </el-form>
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="primary"
           icon="el-icon-plus"
@@ -24,8 +24,8 @@
           @click="handleAdd"
           v-hasPermi="['map:businessCategory:add']"
         >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
+      </el-col> -->
+      <!-- <el-col :span="1.5">
         <el-button
           type="success"
           icon="el-icon-edit"
@@ -44,7 +44,7 @@
           @click="handleDelete"
           v-hasPermi="['map:businessCategory:remove']"
         >删除</el-button>
-      </el-col>
+      </el-col> -->
       <!-- <el-col :span="1.5">
         <el-button
           type="warning"
@@ -56,11 +56,11 @@
       </el-col> -->
     </el-row>
 
-    <el-table v-loading="loading" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" row-key="id" :data="businessCategoryList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" row-key="code" :data="businessCategoryList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="行业名称" align="left" prop="name" />
       <el-table-column label="行业代码" align="left" prop="code" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
            <el-button
             size="mini"
@@ -85,7 +85,7 @@
             v-hasPermi="['map:businessCategory:remove']"
           >删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <!--     
         <pagination
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { listBusinessCategory, getpreBusinessCategory, getBusinessCategory, delBusinessCategory, addBusinessCategory, updateBusinessCategory, exportBusinessCategory } from "@/api/map/businessCategory";
+import { administrativeJson } from "@/api/map/administrative";
 
 export default {
   name: "BusinessCategory",
@@ -145,12 +145,6 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        parentId: undefined,
-        name: undefined,
-        code: undefined,
-        level: undefined,
-        status: undefined,
-        deleted: undefined
       },
       // 表单参数
       form: {},
@@ -166,7 +160,8 @@ export default {
     /** 查询行业分类列表 */
     getList() {
       this.loading = true;
-      listBusinessCategory(this.queryParams).then(response => {
+      administrativeJson(this.queryParams).then(response => {
+        console.log(response.data);
         this.businessCategoryList = response.data.root;
         // this.total = response.total;
         this.loading = false;
