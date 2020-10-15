@@ -301,16 +301,22 @@ input:focus {
                     $('.search_ul').hide();
                     if (location.length == 2) {
                         location = [parseFloat(location['1']), parseFloat(location['0'])];
-                        if (!locationMarker) {
-                            if ($('.bigemap-marker-pane img').length > 1) {
-                                $('.bigemap-marker-pane img')[0].remove()
-                                $('.bigemap-marker-shadow')[0].remove()
-                            }
-                            locationMarker = BM.marker(location, {draggable:true, autoPan: true}).addTo(map);
-                            // locationMarker.bindTooltip(title, { direction: "top", parmanent: true })
+                        if (marker) {
+                            marker.remove()
+                            marker = BM.marker(location, {draggable:true, autoPan: true}).addTo(map);
                         } else {
-                            locationMarker.setLatLng(location);
+                            marker = BM.marker(location, {draggable:true, autoPan: true}).addTo(map);
                         }
+                        // if (!locationMarker) {
+                        //     if ($('.bigemap-marker-pane img').length > 1) {
+                        //         $('.bigemap-marker-pane img')[0].remove()
+                        //         $('.bigemap-marker-shadow')[0].remove()
+                        //     }
+                        //     marker = BM.marker(location, {draggable:true, autoPan: true}).addTo(map);
+                        //     // locationMarker.bindTooltip(title, { direction: "top", parmanent: true })
+                        // } else {
+                        //     marker.setLatLng(location);
+                        // }
                         map.flyTo(location, 15);
                     }
                     break;
