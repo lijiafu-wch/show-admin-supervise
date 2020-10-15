@@ -155,7 +155,13 @@
       </el-row>
       <el-table v-loading="loading" :data="merchantList" @row-click="rowClick" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column label="所属商圈" align="center" prop="businessRoundName" />
+        <!-- <el-table-column label="所属商圈" align="center" prop="businessRoundName" /> -->
+        <el-table-column
+          label="序号"
+          align="center"
+          prop="excelNo"
+          width="100px"
+          :show-overflow-tooltip="true"/>
         <el-table-column
           label="企业名称"
           align="center"
@@ -168,7 +174,31 @@
           prop="legalPerson"
           width="100px"
           :show-overflow-tooltip="true"/>
-        <el-table-column label="成立日期" align="center" prop="merchantDate" width="140">
+          <el-table-column
+            label="联系电话(对外)"
+            align="center"
+            prop="outPhone"
+            width="150px"
+            :show-overflow-tooltip="true"/>
+          <el-table-column
+            label="详细地址"
+            align="center"
+            prop="address"
+            width="300px"
+            :show-overflow-tooltip="true"/>
+            <el-table-column
+              label="经度"
+              align="center"
+              prop="longitude"
+              width="150px"
+              :show-overflow-tooltip="true"/>
+              <el-table-column
+                label="纬度"
+                align="center"
+                prop="latitude"
+                width="150px"
+                :show-overflow-tooltip="true"/>
+       <!-- <el-table-column label="成立日期" align="center" prop="merchantDate" width="140">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.merchantDate, '{y}-{m}-{d}') }}</span>
           </template>
@@ -193,7 +223,7 @@
           align="center"
           prop="threeBusinessCategoryName"
           width="150px"
-          :show-overflow-tooltip="true"/>
+          :show-overflow-tooltip="true"/> -->
         <el-table-column
           label="经营状态"
           align="center"
@@ -208,13 +238,13 @@
           :formatter="specialFormat"
           width="100"
         />
-        <el-table-column
+      <!--  <el-table-column
           label="是否公开"
           align="center"
           prop="publicStatus"
           :formatter="publicFormat"
           width="100"
-        />
+        /> -->
         <el-table-column label="操作" align="center" width="150" fixed="right" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button
