@@ -222,6 +222,24 @@ input:focus {
     // // $('#input').val([lng%360-180,e.latlng.lat].map(v=>v.toFixed(6)).join(','));
     // });
     var marker
+
+    window.addEventListener('message', (e) => {
+         console.log(e.data);
+         if (e.data.type === 'myData') {
+             if(e.data.data.latitude && e.data.data.longitude) {
+                console.log(e.data.latitude, e.data.longitude);
+                marker = BM.marker([e.data.data.latitude, e.data.data.longitude],{draggable:true}).addTo(map);
+                window.parent.postMessage({
+                    result :  e.data.data.latitude + ',' + e.data.data.longitude
+                },'*');
+                marker.on('move',function (e) {
+                    window.parent.postMessage({
+                        result :  e.latlng.lng + ',' + e.latlng.lat
+                    },'*');
+                })
+            }
+        }
+    });
     map.on('contextmenu',function(e){
         // if ($('.bigemap-marker-pane img').length > 1) {
         //     $('.bigemap-marker-pane img')[0].remove()

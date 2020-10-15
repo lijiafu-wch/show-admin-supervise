@@ -450,7 +450,8 @@
         <iframe
           src="/html/map.html"
           frameborder="0"
-          ref="iframe"
+          @load="loaded"
+          ref="myframe"
           style="width: 100%;
           height: 500px;
           z-index: 25;
@@ -614,11 +615,26 @@ export default {
   },
   mounted() {
     window.addEventListener('message', this.hendMessage)
+    // window.addEventListener('message', (event) => {
+    //   const data = event.data
+    //   this.mapCenter = data
+    //   // this.closeSelf();
+    // }, false);
   },
   methods: {
     getMap () {
       this.showMap = true
     },
+    loaded() {
+      // 只有在 iframe 加载时传递数据给子组件，$refs 才是非空的
+      this.$refs.myframe.contentWindow.postMessage({
+        type: 'myData',
+        data: this.form,
+      }, '*');
+    },
+    // closeSelf() { // 关闭当前弹框
+    //   this.$emit('closeIframe');
+    // },
     cancelmap () {
       this.mapCenter = ''
       this.showMap = false
@@ -833,7 +849,6 @@ export default {
     },
     hendMessage(event) {
       const data = event.data
-      console.log(data);
       this.mapCenter = data
     },
     /** 查询商家信息列表 */
