@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+   <!-- <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
       <el-form-item label="区域名称" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入行业名称"
+          placeholder="请输入行政名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -14,7 +14,7 @@
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
-    </el-form>
+    </el-form> -->
     <el-row :gutter="10" class="mb8">
       <!-- <el-col :span="1.5">
         <el-button
@@ -58,8 +58,8 @@
 
     <el-table v-loading="loading" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" row-key="code" :data="businessCategoryList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="行业名称" align="left" prop="name" />
-      <el-table-column label="行业代码" align="left" prop="code" />
+      <el-table-column label="行政名称" align="left" prop="name" />
+      <el-table-column label="行政代码" align="left" prop="code" />
       <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
            <el-button
@@ -87,7 +87,7 @@
         </template>
       </el-table-column> -->
     </el-table>
-    <!--     
+    <!--
         <pagination
           v-show="total>0"
           :total="total"
@@ -96,17 +96,17 @@
           @pagination="getList"
         /> -->
 
-    <!-- 添加或修改行业分类对话框 -->
+    <!-- 添加或修改行政分类对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="上级行业" v-if="addPrename" prop="parentId">
+        <el-form-item label="上级行政" v-if="addPrename" prop="parentId">
           <el-input v-model="addPrename" disabled placeholder="" />
         </el-form-item>
-        <el-form-item label="行业名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入行业名称" />
+        <el-form-item label="行政名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入行政名称" />
         </el-form-item>
-        <el-form-item label="行业代码" prop="code">
-          <el-input v-model="form.code" placeholder="请输入行业代码" />
+        <el-form-item label="行政代码" prop="code">
+          <el-input v-model="form.code" placeholder="请输入行政代码" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -134,7 +134,7 @@ export default {
       multiple: true,
       // 总条数
       total: 0,
-      // 行业分类表格数据
+      // 行政分类表格数据
       businessCategoryList: [],
       // 弹出层标题
       title: "",
@@ -157,7 +157,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询行业分类列表 */
+    /** 查询行政分类列表 */
     getList() {
       this.loading = true;
       administrativeJson(this.queryParams).then(response => {
@@ -244,7 +244,7 @@ export default {
         });
       }
       this.open = true;
-      this.title = "添加行业分类";
+      this.title = "添加行政分类";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -266,7 +266,7 @@ export default {
       getBusinessCategory(id).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改行业分类";
+        this.title = "修改行政分类";
       });
     },
     /** 提交按钮 */
@@ -300,7 +300,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除行业分类编号为"' + ids + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除行政分类编号为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -314,7 +314,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有行业分类数据项?', "警告", {
+      this.$confirm('是否确认导出所有行政分类数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
