@@ -209,7 +209,7 @@
           width="100"
         />
         <el-table-column
-          label="特殊状态"
+          label="是否公开"
           align="center"
           prop="publicStatus"
           :formatter="publicFormat"
