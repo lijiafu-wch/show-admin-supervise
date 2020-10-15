@@ -228,6 +228,7 @@ input:focus {
          if (e.data.type === 'myData') {
              if(e.data.data.latitude && e.data.data.longitude) {
                 console.log(e.data.latitude, e.data.longitude);
+                map.flyTo([e.data.data.latitude, e.data.data.longitude], 15);
                 marker = BM.marker([e.data.data.latitude, e.data.data.longitude],{draggable:true}).addTo(map);
                 window.parent.postMessage({
                     result :  e.data.data.latitude + ',' + e.data.data.longitude
@@ -263,7 +264,6 @@ input:focus {
     //创建一个标注，并设置坐标为当前地图的中心,详细API请参见 http://www.bigemap.com/offlinemaps/api/#marker
     // var marker=BM.marker(map.getCenter(),{draggable:true}).addTo(map);
     //添加一个单击事件。事件列表请参见 ：http://www.bigemap.com/offlinemaps/api/#marker-dragstart
-    
     $('#top_input').on('input', function () {
             let timer = $(this).data('timer');
             clearTimeout(timer);
