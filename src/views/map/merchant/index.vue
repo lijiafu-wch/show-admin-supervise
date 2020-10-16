@@ -333,6 +333,7 @@
               v-model="countyCode"
               style="width: 83.4%"
               placeholder="选择区县、街道、社区"
+              ref="cascader"
               :props="{ checkStrictly: true }"
               clearable
               :options="treeData"
@@ -524,7 +525,7 @@ export default {
       treeFlag: false,
       ShowMore: false,
       activeName: 'first',
-      countyCode: [], // 街道假
+      countyCode: [''], // 街道假
       businessCategoryContent: [], // 分类假
       businessCategoryContent2: [], // 分类2假
       // 日期范围
@@ -545,6 +546,7 @@ export default {
         url: process.env.VUE_APP_BASE_API + '/map/merchant/importData'
       },
       treeData: [],
+      treeDatas: [],
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -709,11 +711,11 @@ export default {
     },
     // 选择新增区县赋值
     selCounty(val) {
-      if (!val) return
-      console.log(this.countyCode);
-      this.form.countyCode = val[1]
-      this.form.streetCode = val[2]
-      this.form.communityCode = val[3]
+      console.log(val);
+      if (!val)  return
+      this.form.countyCode = val[1] ? val[1] : undefined
+      this.form.streetCode = val[2] ? val[2] : undefined
+      this.form.communityCode = val[3] ? val[3] :undefined
     },
     businessCategoryChange2(val) {
       if (!val) return
@@ -869,12 +871,12 @@ export default {
       allDistrict()
         .then(response => {
           this.getTree(response.data.root)
-          // this.treeData = response.data.root
           this.treeData = [{
-            id: '1',
+            value: '',
             label: '七台河市',
             children: response.data.root
           }]
+          console.log(this.treeData)
         })
         .catch((response) => {
           console.log('失败', response)
@@ -994,10 +996,14 @@ export default {
     handleAdd() {
       this.reset()
       if (this.queryParams.countyCode || this.queryParams.streetCode || this.queryParams.communityCode) {
-        disCode(this.queryParams.countyCode || this.queryParams.streetCode || this.queryParams.communityCode).then(response => {
-          console.log(response);
-          this.countyCode = [undefined, response.data.oneCode || undefined, response.data.twoCode || undefined, response.data.threeCode || undefined]
-        })
+        // this.countyCode = response.data.communityCode  || response.data.streetCode || response.data.countyCode || ''
+        this.countyCode = this.queryParams.communityCode || this.queryParams.streetCode || this.queryParams.countyCode || ''
+
+        // disCode(this.queryParams.countyCode || this.queryParams.streetCode || this.queryParams.communityCode).then(response => {
+        // this.countyCode = response.data.communityCode  || response.data.streetCode || response.data.countyCode || ''
+        //   // this.countyCode = ['', response.data.oneCode ? response.data.oneCode :  '', response.data.twoCode ? response.data.twoCode : '', response.data.threeCode ? response.data.threeCode : '']
+        //   // this.$refs['cascader'].focusFirstNode();
+        // })
       }
       // console.log(this.queryParams.countyCode,
       //     this.queryParams.streetCode,
@@ -1019,10 +1025,14 @@ export default {
         this.form.operationStatus = response.data.operationStatus + ''
         this.form.specialStatus = response.data.specialStatus + ''
         this.form.publicStatus = response.data.publicStatus + ''
-        this.countyCode = [undefined, response.data.countyCode, response.data.streetCode, response.data.communityCode]
         this.businessCategoryContent2 = [response.data.firstBusinessCategory, response.data.secondBusinessCategory, response.data.threeBusinessCategory]
+        // this.countyCode = ['', response.data.countyCode ? response.data.countyCode : '', response.data.streetCode ? response.data.streetCode :  '', response.data.communityCode ? response.data.communityCode : '']
+        this.countyCode = response.data.communityCode  || response.data.streetCode || response.data.countyCode || ''
+        console.log(this.countyCode);
         this.title = '修改商家信息'
         this.open = true
+        
+
       })
     },
     /** 提交按钮 */
