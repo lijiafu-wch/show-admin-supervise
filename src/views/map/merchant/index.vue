@@ -766,11 +766,14 @@ export default {
     },
     handleAvatarSuccess(res, file, fileList) {
       this.imageUrl = fileList
-      if (this.imageUrl && this.imageUrl.length > 0) {
-        this.form.pictureOne = this.imageUrl[0].response.url
+      console.log(this.imageUrl);
+      if (this.imageUrl && this.imageUrl.length === 1) {
+        this.form.pictureOne = this.imageUrl[0].response ? this.imageUrl[0].response.url : this.imageUrl[0].url
+        this.form.pictureTwo = ''
       }
-      if (this.imageUrl && this.imageUrl.length > 1) {
-        this.form.pictureTwo = this.imageUrl[1].response.url
+      if (this.imageUrl && this.imageUrl.length === 2) {
+        this.form.pictureOne = this.imageUrl[0].response ? this.imageUrl[0].response.url : this.imageUrl[0].url
+        this.form.pictureTwo = this.imageUrl[1].response ? this.imageUrl[1].response.url : this.imageUrl[1].url
       }
       if (!this.imageUrl || this.imageUrl.length === 0) {
         this.form.pictureOne = ''
