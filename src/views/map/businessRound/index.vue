@@ -149,14 +149,17 @@
         <el-form-item label="商圈名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商圈名称" style="width: 300px;"/>
         </el-form-item>
-        <el-form-item label="详细地址" prop="address">
+        <el-form-item style="position: relative;" label="详细地址" prop="address">
           <el-input v-model="form.address" type="textarea" placeholder="请输入内容" style="width: 300px;"/>
+          <i @click="getMap" class="el-icon-location-information info_th info_border_r" style="padding: 10px 5px;cursor: pointer;    position: absolute;
+    left: 270px;
+    top: 6px;"></i>
         </el-form-item>
         <el-form-item label="经度" prop="longitude">
-          <el-input v-model="form.longitude" placeholder="请输入经度" style="width: 100px;"/>
+          <el-input v-model="form.longitude" placeholder="请输入经度" style="width: 300px;"/>
         </el-form-item>
         <el-form-item label="纬度" prop="latitude">
-          <el-input v-model="form.latitude" placeholder="请输入纬度" style="width: 100px;"/>
+          <el-input v-model="form.latitude" placeholder="请输入纬度" style="width: 300px;"/>
         </el-form-item>
         <el-form-item label="图片" prop="picture">
           <el-upload
@@ -175,7 +178,7 @@
           <!-- <el-input v-model="form.picture" placeholder="请输入图片" /> -->
         </el-form-item>
         <el-form-item label="介绍" prop="detal">
-          <Editor v-model="form.detail" />
+          <Editor v-model="form.detal" />
           <!-- <el-input v-model="form.detal" type="textarea" placeholder="请输入内容" /> -->
         </el-form-item>
       </el-form>
@@ -184,6 +187,25 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+    <el-dialog :title="'定位'" :visible.sync="showMap" width="80%" append-to-body>
+        <iframe
+          src="/html/map.html"
+          frameborder="0"
+          @load="loaded"
+          ref="myframe"
+          style="width: 100%;
+          height: 500px;
+          z-index: 25;
+          margin-top: 0px;
+          margin-right: 10px;
+          margin-left: 10px;
+          margin-bottom: 10px;"
+          />
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitMap">确 定</el-button>
+          <el-button @click="cancelmap">取 消</el-button>
+        </div>
+      </el-dialog>
   </div>
 </template>
 
@@ -217,8 +239,10 @@ export default {
       businessRoundList: [],
       // 弹出层标题
       title: '',
+      showMap: false,
       // 是否显示弹出层
       open: false,
+      mapCenter: '',
       imageUrl: [],
       // 查询参数
       queryParams: {
@@ -242,6 +266,9 @@ export default {
   },
   created() {
     this.getList()
+  },
+  mounted() {
+    window.addEventListener('message', this.hendMessage)
   },
   methods: {
     handlePictureCardPreview(file) {
@@ -278,6 +305,29 @@ export default {
     cancel() {
       this.open = false
       this.reset()
+    },
+    loaded() {
+      // 只有在 iframe 加载时传递数据给子组件，$refs 才是非空的
+      this.$refs.myframe.contentWindow.postMessage({
+        type: 'myData',
+        data: this.form,
+      }, '*');
+    }, 
+    cancelmap () {
+      this.mapCenter = ''
+      this.showMap = false
+    },
+    hendMessage(event) {
+      const data = event.data
+      this.mapCenter = data
+    },
+    submitMap () {
+      if (!this.mapCenter) {
+        return
+      }
+      this.form.longitude = this.mapCenter.result.split(',')[0]
+      this.form.latitude = this.mapCenter.result.split(',')[1]
+      this.showMap = false
     },
     // 表单重置
     reset() {
@@ -334,6 +384,9 @@ export default {
         this.open = true
         this.title = '修改商圈'
       })
+    },
+    getMap () {
+      this.showMap = true
     },
     /** 提交按钮 */
     submitForm: function() {
