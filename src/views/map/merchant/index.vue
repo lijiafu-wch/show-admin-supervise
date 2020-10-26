@@ -1038,6 +1038,29 @@ export default {
     /** 提交按钮 */
     submitForm: function() {
       console.log(this.form)
+      if (this.form.name) {
+        this.msgError('企业民称不能为空')
+        return
+      } else if (this.form.creditCode) {
+        this.msgError('统一社会信用代码不能为空')
+        return
+      } else if (this.form.legalPerson) {
+        this.msgError('法定代表人不能为空')
+        return
+      } else if (this.countyCode) {
+        this.msgError('法定代表人不能为空')
+        return
+      } else if (this.form.address) {
+        this.msgError('详细地址不能为空')
+        return
+      } else if (this.form.operationStatus) {
+        this.msgError('经营状态不能为空')
+        return
+      } else if (this.form.specialStatus) {
+        this.msgError('经营状态不能为空')
+        return
+      }
+      
       if (this.form.id != undefined) {
         updateMerchant(this.form).then(response => {
           if (response.code === 200) {
