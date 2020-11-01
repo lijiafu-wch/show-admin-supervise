@@ -1020,6 +1020,8 @@ export default {
           this.filelist = [{ name: '照片1', url: response.data.pictureOne }, { name: '照片2', url: response.data.pictureTwo }]
         } else if (response.data.pictureOne) {
           this.filelist = [{ name: '照片1', url: response.data.pictureOne }]
+        } else {
+          this.filelist = []
         }
         this.form = response.data
         this.form.operationStatus = response.data.operationStatus + ''
@@ -1038,25 +1040,25 @@ export default {
     /** 提交按钮 */
     submitForm: function() {
       console.log(this.form)
-      if (this.form.name) {
+      if (!this.form.name) {
         this.msgError('企业民称不能为空')
         return
-      } else if (this.form.creditCode) {
+      } else if (!this.form.creditCode) {
         this.msgError('统一社会信用代码不能为空')
         return
-      } else if (this.form.legalPerson) {
+      } else if (!this.form.legalPerson) {
         this.msgError('法定代表人不能为空')
         return
-      } else if (this.countyCode) {
+      } else if (!this.countyCode) {
         this.msgError('法定代表人不能为空')
         return
-      } else if (this.form.address) {
+      } else if (!this.form.address) {
         this.msgError('详细地址不能为空')
         return
-      } else if (this.form.operationStatus) {
+      } else if (!this.form.operationStatus) {
         this.msgError('经营状态不能为空')
         return
-      } else if (this.form.specialStatus) {
+      } else if (!this.form.specialStatus) {
         this.msgError('经营状态不能为空')
         return
       }
