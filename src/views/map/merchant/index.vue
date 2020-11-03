@@ -16,19 +16,30 @@
           />
         </el-form-item>
         <el-form-item label="行业分类">
-          <el-cascader
+           <el-cascader
+              v-model="businessCategoryContent"
+             style="width: 240px"
+              placeholder="行业分类"
+              ref="cascader"
+              :props="{ checkStrictly: true }"
+              clearable
+              :options="optionsBusinessCategory"
+              @change="businessCategoryChange"
+            />
+          <!-- <el-cascader
             v-model="businessCategoryContent"
             placeholder="行业分类"
             clearable
             :options="optionsBusinessCategory"
             @change="businessCategoryChange"
-          />
+          /> -->
         </el-form-item>
         <el-form-item label="商圈" prop="businessRoundId">
           <el-select
             v-model="queryParams.businessRoundId"
             placeholder="商圈"
             clearable
+            style="width: 240px"
             size="small"
           >
             <el-option
@@ -725,10 +736,19 @@ export default {
     },
     // 分类选择查询赋值
     businessCategoryChange(val) {
+      console.log(2);
       if (!val) return
-      this.queryParams.firstBusinessCategory = val[0]
-      this.queryParams.secondBusinessCategory = val[1]
-      this.queryParams.threeBusinessCategory = val[2]
+      // this.form.countyCode = val[1] ? val[1] : undefined
+      // this.form.streetCode = val[2] ? val[2] : undefined
+      // this.form.communityCode = val[3] ? val[3] :undefined
+
+      this.queryParams.firstBusinessCategory = val[0] ? val[0] : undefined
+      this.queryParams.secondBusinessCategory = val[1] ? val[1] : undefined
+      this.queryParams.threeBusinessCategory = val[2] ? val[2] : undefined
+
+      // this.queryParams.firstBusinessCategory = val[0]
+      // this.queryParams.secondBusinessCategory = val[1]
+      // this.queryParams.threeBusinessCategory = val[2]
     },
     // 表格切换
     handleClick(tab, event) {
