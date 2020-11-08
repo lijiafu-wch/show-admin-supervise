@@ -1,8 +1,10 @@
 <template>
   <div class="app-container">
-    <el-tree class="treelist" v-show="treeFlag" node-key="id" :default-expanded-keys="[1]" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
-    <i class="el-icon-s-unfold" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="!treeFlag"></i>
-    <i class="el-icon-s-fold" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="treeFlag"></i>
+    <div class="treelistbox">
+        <el-tree class="treelist" v-show="treeFlag" node-key="id" :default-expanded-keys="[1]" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
+        <i class="el-icon-s-unfold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="!treeFlag"></i>
+        <i class="el-icon-s-fold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="treeFlag"></i>
+    </div>
     <div class="treeline" v-show="treeFlag" />
     <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }" >
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
@@ -1183,14 +1185,24 @@ export default {
     display: flex;
   }
   .treeGrid {
-    width: 90%;
+    width: 85%;
     margin-left: 24px;
   }
   .treeGridclose {
-    width: 100%;
+    width: 98%;
+  }
+  .iconshow {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .treelistbox {
+    width: 15%;
+    overflow: auto;
+    max-height: 700px;
+    position: relative;
   }
   .treelist {
-    width: 15%;
     margin-right: 15px;
   }
   .treeline {

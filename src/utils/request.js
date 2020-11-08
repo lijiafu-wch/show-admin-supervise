@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2020-08-23 09:00:10
- * @LastEditTime: 2020-11-05 13:04:26
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /show-admin-supervise/src/utils/request.js
- */
 import axios from 'axios'
 import { Notification, MessageBox, Message } from 'element-ui'
 import store from '@/store'
@@ -17,7 +9,7 @@ const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: process.env.VUE_APP_BASE_API,
   // 超时
-  timeout: 1000000
+  timeout: 10000000
 })
 // request拦截器
 service.interceptors.request.use(
