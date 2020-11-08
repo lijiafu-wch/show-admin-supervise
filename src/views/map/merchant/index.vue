@@ -17,24 +17,14 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="行业分类">
-           <el-cascader
-              v-model="businessCategoryContent"
-             style="width: 240px"
-              placeholder="行业分类"
-              ref="cascader"
-              :props="{ checkStrictly: true }"
-              clearable
-              :options="optionsBusinessCategory"
-              @change="businessCategoryChange"
-            />
-          <!-- <el-cascader
-            v-model="businessCategoryContent"
-            placeholder="行业分类"
+        <el-form-item label="法人代表" prop="legalPerson">
+          <el-input
+            v-model="queryParams.legalPerson"
+            placeholder="请输入法人代表"
             clearable
-            :options="optionsBusinessCategory"
-            @change="businessCategoryChange"
-          /> -->
+            size="small"
+            @keyup.enter.native="handleQuery"
+          />
         </el-form-item>
         <el-form-item label="商圈" prop="businessRoundId">
           <el-select
@@ -65,7 +55,7 @@
           />
         </el-form-item>
 
-        <!-- <el-form-item label="经营状态" prop="operationStatus">
+         <el-form-item label="经营状态" prop="operationStatus">
           <el-select v-model="queryParams.operationStatus" placeholder="请选择经营状态" clearable size="small">
             <el-option
               v-for="item in operationList"
@@ -85,7 +75,20 @@
             />
           </el-select>
         </el-form-item>
-
+        <el-form-item label="行业分类">
+          <el-cascader
+            ref="cascader"
+            v-model="businessCategoryContent"
+            style="width: 240px"
+            placeholder="行业分类"
+            :props="{ checkStrictly: true }"
+            clearable
+            :options="optionsBusinessCategory"
+            @change="businessCategoryChange"
+          />
+        
+        </el-form-item>
+      <!--
         <el-form-item label="是否在平台公开" prop="publicStatus">
           <el-select v-model="queryParams.publicStatus" placeholder="请选择是否在平台公开" clearable size="small">
              <el-option
@@ -131,6 +134,23 @@
             @click="handleDelete"
           >删除</el-button>
         </el-col>
+
+        <el-col :span="1.5">
+          <el-button
+            v-if="!ShowMore"
+            type="success"
+            icon="el-icon-circle-plus-outline"
+            size="mini"
+            @click="handleShowMore"
+          >展示证书明细</el-button>
+          <el-button
+            v-if="ShowMore"
+            type="success"
+            icon="el-icon-remove-outline"
+            size="mini"
+            @click="handleShowMore"
+          >收起证书明细</el-button>
+        </el-col>
         <el-col :span="1.5">
           <el-button
             v-hasPermi="['system:user:import']"
@@ -146,25 +166,28 @@
             type="warning"
             icon="el-icon-download"
             size="mini"
-            @click="handleExport"
-          >导出</el-button>
+            @click="handleExport(1)"
+          >导出当前页</el-button>
         </el-col>
-         <el-col :span="1.5">
+        <el-col :span="1.5">
           <el-button
-            v-if="!ShowMore"
-            type="success"
-            icon="el-icon-circle-plus-outline"
+            v-hasPermi="['map:merchant:export']"
+            type="warning"
+            icon="el-icon-download"
             size="mini"
-            @click="handleShowMore"
-          >展示证书明细</el-button>
-           <el-button
-            type="success"
-            v-if="ShowMore"
-            icon="el-icon-remove-outline"
-            size="mini"
-            @click="handleShowMore"
-          >收起证书明细</el-button>
+            @click="handleExport(2)"
+          >导出按条件</el-button>
         </el-col>
+        <el-col :span="1.5">
+          <el-button
+            v-hasPermi="['map:merchant:export']"
+            type="warning"
+            icon="el-icon-download"
+            size="mini"
+            @click="handleExport(3)"
+          >导出所有</el-button>
+        </el-col>
+
       </el-row>
       <el-table v-loading="loading" :data="merchantList" @row-click="rowClick" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" />
@@ -174,44 +197,51 @@
           align="center"
           prop="excelNo"
           width="100px"
-          :show-overflow-tooltip="true"/>
+          :show-overflow-tooltip="true"
+        />
         <el-table-column
           label="企业名称"
           align="center"
           prop="name"
           width="300px"
-          :show-overflow-tooltip="true"/>
+          :show-overflow-tooltip="true"
+        />
         <el-table-column
           label="法人代表"
           align="center"
           prop="legalPerson"
           width="100px"
-          :show-overflow-tooltip="true"/>
-          <el-table-column
-            label="联系电话(对外)"
-            align="center"
-            prop="outPhone"
-            width="150px"
-            :show-overflow-tooltip="true"/>
-          <el-table-column
-            label="详细地址"
-            align="center"
-            prop="address"
-            width="300px"
-            :show-overflow-tooltip="true"/>
-            <el-table-column
-              label="经度"
-              align="center"
-              prop="longitude"
-              width="150px"
-              :show-overflow-tooltip="true"/>
-              <el-table-column
-                label="纬度"
-                align="center"
-                prop="latitude"
-                width="150px"
-                :show-overflow-tooltip="true"/>
-       <!-- <el-table-column label="成立日期" align="center" prop="merchantDate" width="140">
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="联系电话(对外)"
+          align="center"
+          prop="outPhone"
+          width="150px"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="详细地址"
+          align="center"
+          prop="address"
+          width="300px"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="经度"
+          align="center"
+          prop="longitude"
+          width="150px"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          label="纬度"
+          align="center"
+          prop="latitude"
+          width="150px"
+          :show-overflow-tooltip="true"
+        />
+        <!-- <el-table-column label="成立日期" align="center" prop="merchantDate" width="140">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.merchantDate, '{y}-{m}-{d}') }}</span>
           </template>
@@ -251,7 +281,7 @@
           :formatter="specialFormat"
           width="100"
         />
-      <!--  <el-table-column
+        <!--  <el-table-column
           label="是否公开"
           align="center"
           prop="publicStatus"
@@ -343,10 +373,10 @@
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>选择区县、街道、社区</div>
             <el-cascader
+              ref="cascader"
               v-model="countyCode"
               style="width: 83.4%"
               placeholder="选择区县、街道、社区"
-              ref="cascader"
               :props="{ checkStrictly: true }"
               clearable
               :options="treeData"
@@ -356,7 +386,7 @@
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 17%" class="info_th ib info_border_r"><span class="must">*</span>详细地址</div>
             <el-input v-model="form.address" style="width: 31%" class="ib" placeholder="请输入内容" />
-            <i @click="getMap" class="el-icon-location-information info_th info_border_r" style="padding: 10px 5px;cursor: pointer;"></i>
+            <i class="el-icon-location-information info_th info_border_r" style="padding: 10px 5px;cursor: pointer;" @click="getMap" />
             <div style="width: 12.5%" class="info_th ib info_border_r">经度</div>
             <el-input v-model="form.longitude" style="width: 12.5%" class="info_border_r" placeholder="请输入内容" />
             <div style="width: 12.5%" class="info_th ib info_border_r">纬度</div>
@@ -492,10 +522,9 @@
       </el-dialog>
       <el-dialog :title="'定位'" :visible.sync="showMap" width="80%" append-to-body>
         <iframe
+          ref="myframe"
           src="/html/map.html"
           frameborder="0"
-          @load="loaded"
-          ref="myframe"
           style="width: 100%;
           height: 500px;
           z-index: 25;
@@ -503,7 +532,8 @@
           margin-right: 10px;
           margin-left: 10px;
           margin-bottom: 10px;"
-          />
+          @load="loaded"
+        />
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="submitMap">确 定</el-button>
           <el-button @click="cancelmap">取 消</el-button>
@@ -621,7 +651,8 @@ export default {
         pictureOne: undefined,
         pictureTwo: undefined,
         excelNo: undefined,
-        deleted: undefined
+        deleted: undefined,
+        exportStatus: 1
       },
       currentId: '',
       // 表单参数
@@ -667,24 +698,24 @@ export default {
     // }, false);
   },
   methods: {
-    getMap () {
+    getMap() {
       this.showMap = true
     },
     loaded() {
       // 只有在 iframe 加载时传递数据给子组件，$refs 才是非空的
       this.$refs.myframe.contentWindow.postMessage({
         type: 'myData',
-        data: this.form,
-      }, '*');
+        data: this.form
+      }, '*')
     },
     // closeSelf() { // 关闭当前弹框
     //   this.$emit('closeIframe');
     // },
-    cancelmap () {
+    cancelmap() {
       this.mapCenter = ''
       this.showMap = false
     },
-    submitMap () {
+    submitMap() {
       if (!this.mapCenter) {
         return
       }
@@ -692,10 +723,10 @@ export default {
       this.form.latitude = this.mapCenter.result.split(',')[1]
       this.showMap = false
     },
-    handleShowMore () {
+    handleShowMore() {
       this.ShowMore = !this.ShowMore
     },
-    checkTree () {
+    checkTree() {
       this.treeFlag = !this.treeFlag
     },
     // 商圈查询赋值
@@ -724,11 +755,11 @@ export default {
     },
     // 选择新增区县赋值
     selCounty(val) {
-      console.log(val);
-      if (!val)  return
+      console.log(val)
+      if (!val) return
       this.form.countyCode = val[1] ? val[1] : undefined
       this.form.streetCode = val[2] ? val[2] : undefined
-      this.form.communityCode = val[3] ? val[3] :undefined
+      this.form.communityCode = val[3] ? val[3] : undefined
     },
     businessCategoryChange2(val) {
       if (!val) return
@@ -738,7 +769,7 @@ export default {
     },
     // 分类选择查询赋值
     businessCategoryChange(val) {
-      console.log(2);
+      console.log(2)
       if (!val) return
       // this.form.countyCode = val[1] ? val[1] : undefined
       // this.form.streetCode = val[2] ? val[2] : undefined
@@ -790,7 +821,7 @@ export default {
     },
     handleAvatarSuccess(res, file, fileList) {
       this.imageUrl = fileList
-      console.log(this.imageUrl);
+      console.log(this.imageUrl)
       if (this.imageUrl && this.imageUrl.length === 1) {
         this.form.pictureOne = this.imageUrl[0].response ? this.imageUrl[0].response.url : this.imageUrl[0].url
         this.form.pictureTwo = ''
@@ -1051,12 +1082,10 @@ export default {
         this.form.publicStatus = response.data.publicStatus + ''
         this.businessCategoryContent2 = [response.data.firstBusinessCategory, response.data.secondBusinessCategory, response.data.threeBusinessCategory]
         // this.countyCode = ['', response.data.countyCode ? response.data.countyCode : '', response.data.streetCode ? response.data.streetCode :  '', response.data.communityCode ? response.data.communityCode : '']
-        this.countyCode = response.data.communityCode  || response.data.streetCode || response.data.countyCode || ''
-        console.log(this.countyCode);
+        this.countyCode = response.data.communityCode || response.data.streetCode || response.data.countyCode || ''
+        console.log(this.countyCode)
         this.title = '修改商家信息'
         this.open = true
-        
-
       })
     },
     /** 提交按钮 */
@@ -1084,7 +1113,7 @@ export default {
         this.msgError('经营状态不能为空')
         return
       }
-      
+
       if (this.form.id != undefined) {
         updateMerchant(this.form).then(response => {
           if (response.code === 200) {
@@ -1122,9 +1151,18 @@ export default {
       }).catch(function() {})
     },
     /** 导出按钮操作 */
-    handleExport() {
+    handleExport(estatus) {
+      var evalue = '是否确认导出当前页商家信息?'
+
+      if (estatus == '2') {
+        evalue = '是否确认按条件导出商家信息?'
+      }
+      if (estatus == '3') {
+        evalue = '是否确认导出全部商家信息?'
+      }
+      this.queryParams.exportStatus = estatus
       const queryParams = this.queryParams
-      this.$confirm('是否确认导出所有商家信息数据项?', '警告', {
+      this.$confirm(evalue, '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -1207,7 +1245,7 @@ export default {
   }
   .treeline {
     width: 1px;
-    background: #eee;
+    // background: #eee;
   }
 </style>
 <style>
