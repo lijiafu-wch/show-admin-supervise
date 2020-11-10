@@ -5,13 +5,22 @@
         <i class="el-icon-s-unfold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="!treeFlag"></i>
         <i class="el-icon-s-fold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="treeFlag"></i>
     </div>
-    <div class="treeline" v-show="treeFlag" />
-    <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }" >
+    <div v-show="treeFlag" class="treeline" />
+    <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }">
       <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
         <el-form-item label="企业名称" prop="name">
           <el-input
             v-model="queryParams.name"
             placeholder="请输入企业名称"
+            clearable
+            size="small"
+            @keyup.enter.native="handleQuery"
+          />
+        </el-form-item>
+        <el-form-item label="社会信用代码" prop="creditCode" label-width="100px">
+          <el-input
+            v-model="queryParams.creditCode"
+            placeholder="请输入统一社会信用代码"
             clearable
             size="small"
             @keyup.enter.native="handleQuery"
@@ -55,7 +64,7 @@
           />
         </el-form-item>
 
-         <el-form-item label="经营状态" prop="operationStatus">
+        <el-form-item label="经营状态" prop="operationStatus">
           <el-select v-model="queryParams.operationStatus" placeholder="请选择经营状态" clearable size="small">
             <el-option
               v-for="item in operationList"
@@ -67,7 +76,7 @@
         </el-form-item>
         <el-form-item label="特殊状态" prop="specialStatus">
           <el-select v-model="queryParams.specialStatus" placeholder="请选择特殊状态" clearable size="small">
-             <el-option
+            <el-option
               v-for="item2 in specialList"
               :key="item2.dictValue"
               :label="item2.dictLabel"
@@ -86,9 +95,9 @@
             :options="optionsBusinessCategory"
             @change="businessCategoryChange"
           />
-        
+
         </el-form-item>
-      <!--
+        <!--
         <el-form-item label="是否在平台公开" prop="publicStatus">
           <el-select v-model="queryParams.publicStatus" placeholder="请选择是否在平台公开" clearable size="small">
              <el-option
@@ -158,7 +167,16 @@
             icon="el-icon-upload2"
             size="mini"
             @click="handleImport"
-          >导入</el-button>
+          >数据导入</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            v-hasPermi="['system:user:import']"
+            type="info"
+            icon="el-icon-upload2"
+            size="mini"
+            @click="handleImportLongitude"
+          >经纬度导入</el-button>
         </el-col>
         <el-col :span="1.5">
           <el-button
@@ -520,6 +538,37 @@
           <el-button @click="upload.open = false">取 消</el-button>
         </div>
       </el-dialog>
+
+      <!-- 经纬度导入对话框 -->
+      <el-dialog :title="longitudeUpload.title" :visible.sync="longitudeUpload.open" width="400px" append-to-body>
+        <el-upload
+          ref="longitudeUpload"
+          :limit="1"
+          accept=".xlsx, .xls"
+          :headers="longitudeUpload.headers"
+          :action="longitudeUpload.url + '?updateSupport=' + longitudeUpload.updateSupport"
+          :disabled="longitudeUpload.isUploading"
+          :on-progress="handleFileLongitudeUploadProgress"
+          :on-success="handleFileLongitudeSuccess"
+          :auto-upload="false"
+          drag
+        >
+          <i class="el-icon-upload" />
+          <div class="el-upload__text">
+            将文件拖到此处，或
+            <em>点击上传</em>
+          </div>
+          <div slot="tip" class="el-upload__tip">
+            <!-- <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据 -->
+            <el-link type="info" style="font-size:12px;color: #1890ff;" @click="importTemplateLongitude">下载模板</el-link>
+          </div>
+          <div slot="tip" class="el-upload__tip" style="color:red">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
+        </el-upload>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitLongitudeFileForm">确 定</el-button>
+          <el-button @click="longitudeUpload.open = false">取 消</el-button>
+        </div>
+      </el-dialog>
       <el-dialog :title="'定位'" :visible.sync="showMap" width="80%" append-to-body>
         <iframe
           ref="myframe"
@@ -544,7 +593,7 @@
 </template>
 
 <script>
-import { listMerchant, getMerchant, delMerchant, disCode, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate } from '@/api/map/merchant'
+import { listMerchant, getMerchant, delMerchant, disCode, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate, merchantimportLongitudeTemplate } from '@/api/map/merchant'
 import { allDistrict } from '@/api/map/district'
 import { listBusinessRound } from '@/api/map/businessRound'
 import { listBusinessCategory } from '@/api/map/businessCategory'
@@ -573,7 +622,7 @@ export default {
       businessCategoryContent2: [], // 分类2假
       // 日期范围
       dateRange: [],
-      // 用户导入参数
+      // 数据导入参数
       upload: {
         // 是否显示弹出层（用户导入）
         open: false,
@@ -587,6 +636,21 @@ export default {
         headers: { Authorization: 'Bearer ' + getToken() },
         // 上传的地址
         url: process.env.VUE_APP_BASE_API + '/map/merchant/importData'
+      },
+      // 经纬度导入参数
+      longitudeUpload: {
+        // 是否显示弹出层（用户导入）
+        open: false,
+        // 弹出层标题（用户导入）
+        title: '',
+        // 是否禁用上传
+        isUploading: false,
+        // 是否更新已经存在的用户数据
+        updateSupport: 0,
+        // 设置上传的请求头部
+        headers: { Authorization: 'Bearer ' + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + '/map/merchant/importLongitudeData'
       },
       treeData: [],
       treeDatas: [],
@@ -950,7 +1014,7 @@ export default {
     },
     /** 导入按钮操作 */
     handleImport() {
-      this.upload.title = '用户导入'
+      this.upload.title = '数据导入'
       this.upload.open = true
     },
     /** 下载模板操作 */
@@ -1171,6 +1235,33 @@ export default {
       }).then(response => {
         this.download(response.msg)
       }).catch(function() {})
+    },
+    /** 导入经纬度按钮操作 */
+    handleImportLongitude() {
+      this.longitudeUpload.title = '经纬度导入'
+      this.longitudeUpload.open = true
+    },
+    /** 下载经纬度模板操作 */
+    importTemplateLongitude() {
+      merchantimportLongitudeTemplate().then(response => {
+        this.download(response.msg)
+      })
+    },
+    // 文件经纬度上传中处理
+    handleFileLongitudeUploadProgress(event, file, fileList) {
+      this.longitudeUpload.isUploading = true
+    },
+    // 文件经纬度上传成功处理
+    handleFileLongitudeSuccess(response, file, fileList) {
+      this.longitudeUpload.open = false
+      this.longitudeUpload.isUploading = false
+      this.$refs.longitudeUpload.clearFiles()
+      this.$alert(response.msg, '导入结果', { dangerouslyUseHTMLString: true })
+      this.getList()
+    },
+    // 提交上传文件
+    submitLongitudeFileForm() {
+      this.$refs.longitudeUpload.submit()
     }
   }
 }

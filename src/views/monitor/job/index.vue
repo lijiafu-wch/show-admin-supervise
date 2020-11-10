@@ -84,6 +84,14 @@
           v-hasPermi="['monitor:job:query']"
         >日志</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          icon="el-icon-s-operation"
+          size="mini"
+          @click="cacheRefresh"
+        >刷新缓存</el-button>
+      </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange">
@@ -260,7 +268,7 @@
 </template>
 
 <script>
-import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, changeJobStatus } from "@/api/monitor/job";
+import { listJob, getJob, delJob, addJob, updateJob, exportJob, runJob, changeJobStatus,refresh } from "@/api/monitor/job";
 
 export default {
   name: "Job",
@@ -411,6 +419,12 @@ export default {
     /** 任务日志列表查询 */
     handleJobLog() {
       this.$router.push("/job/log");
+    },
+    /** 刷新操作 */
+    cacheRefresh() {
+      refresh().then(response => {
+       this.msgSuccess("缓存刷新成功");
+      });
     },
     /** 新增按钮操作 */
     handleAdd() {

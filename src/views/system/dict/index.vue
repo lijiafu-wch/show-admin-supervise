@@ -215,7 +215,7 @@ export default {
           { required: true, message: '字典名称不能为空', trigger: 'blur' }
         ],
         dictType: [
-          { required: true, message: "字典类型不能为空", trigger: "blur" }
+          { required: true, message: '字典类型不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -292,7 +292,7 @@ export default {
     },
     /** 提交按钮 */
     submitForm: function() {
-      this.form.dictType = 'mapOptions'
+      // this.form.dictType = 'mapOptions'
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.dictId != undefined) {
