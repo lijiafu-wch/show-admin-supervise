@@ -37,6 +37,7 @@
         </el-form-item>
         <el-form-item label="商圈" prop="businessRoundId">
            <el-cascader
+          v-model="businessRoundId"
           @change="businessRoundIdhandleChange"
           :props="{ label: 'name', value: 'id', children: 'businessRounds'}"
           :options="businessRoundIdoptions"
@@ -630,6 +631,7 @@ export default {
     return {
       treeFlag: false,
       ShowMore: false,
+      businessRoundId: undefined,
       businessRoundIdoptions: [], // 商圈树参数
       activeName: 'first',
       countyCode: [''], // 街道假
@@ -1131,8 +1133,10 @@ export default {
     resetQuery() {
       this.dateRange = []
       this.resetForm('queryForm')
+      this.businessRoundId = undefined
       this.queryParams.countyCode = undefined
       this.queryParams.streetCode = undefined
+      this.queryParams.businessRoundId = undefined
       this.queryParams.communityCode = undefined
       this.queryParams.firstBusinessCategory = undefined
       this.queryParams.secondBusinessCategory = undefined
