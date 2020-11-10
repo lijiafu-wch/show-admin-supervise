@@ -4,6 +4,16 @@
       <el-form-item label="商圈名称" prop="name">
         <el-input v-model="queryParams.name" placeholder="请输入商圈名称" />
       </el-form-item>
+     <el-form-item label="区县" prop="countyCode">
+       <el-select v-model="queryParams.countyCode" placeholder="区县" clearable size="small">
+         <el-option
+           v-for="item in countyCodeList"
+           :key="item.dictValue"
+           :label="item.dictLabel"
+           :value="item.dictValue"
+         />
+       </el-select>
+     </el-form-item>
       <!-- <el-form-item label="经度" prop="longitude">
         <el-input
           v-model="queryParams.longitude"
@@ -101,6 +111,15 @@
         :show-overflow-tooltip="true"
       />
       <el-table-column
+        label="区县"
+        align="center"
+        prop="countyCode"
+        :formatter="countyCodeFormat"
+        width="100"
+      />
+
+
+      <el-table-column
         label="详细地址"
         align="center"
         prop="address"
@@ -108,12 +127,12 @@
       />
       <!--      <el-table-column label="经度" align="center" prop="longitude" />
       <el-table-column label="纬度" align="center" prop="latitude" /> -->
-      <el-table-column
+<!--      <el-table-column
         label="介绍"
         align="center"
         prop="detal"
         :show-overflow-tooltip="true"
-      />
+      /> -->
       <!-- <el-table-column label="图片" align="center" prop="picture" /> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -149,6 +168,25 @@
         <el-form-item label="商圈名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商圈名称" style="width: 300px;"/>
         </el-form-item>
+
+        <el-form-item label="区县" prop="countyCode">
+          <el-select
+            v-model="form.countyCode"
+            placeholder="区县"
+            clearable
+            class="ib info_border_r"
+            size="small"
+            style="width: 16.6%"
+          >
+            <el-option
+              v-for="(item, index) in countyCodeList"
+              :key="index"
+              :label="item.dictLabel"
+              :value="item.dictValue"
+            />
+          </el-select>
+        </el-form-item>
+
         <el-form-item style="position: relative;" label="详细地址" prop="address">
           <el-input v-model="form.address" type="textarea" placeholder="请输入内容" style="width: 300px;"/>
           <i @click="getMap" class="el-icon-location-information info_th info_border_r" style="padding: 10px 5px;cursor: pointer;    position: absolute;
@@ -244,6 +282,8 @@ export default {
       open: false,
       mapCenter: '',
       imageUrl: [],
+      //区县字典
+      countyCodeList: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -265,6 +305,10 @@ export default {
     }
   },
   created() {
+   // 字典 区县
+    this.getDicts('map_county_code').then(response => {
+      this.countyCodeList = response.data
+    })
     this.getList()
   },
   mounted() {
@@ -312,7 +356,7 @@ export default {
         type: 'myData',
         data: this.form,
       }, '*');
-    }, 
+    },
     cancelmap () {
       this.mapCenter = ''
       this.showMap = false
@@ -328,6 +372,10 @@ export default {
       this.form.longitude = this.mapCenter.result.split(',')[0]
       this.form.latitude = this.mapCenter.result.split(',')[1]
       this.showMap = false
+    },
+      // 区县
+    countyCodeFormat(row, column) {
+      return this.selectDictLabel(this.countyCodeList, row.countyCode)
     },
     // 表单重置
     reset() {

@@ -68,6 +68,14 @@ export function merchantimportTemplate() {
   })
 }
 
+// 下载经纬度导入模板
+export function merchantimportLongitudeTemplate() {
+  return request({
+    url: 'map/merchant/importLongitudeTemplate',
+    method: 'get'
+  })
+}
+
 // 下载导入模板
 export function disCode(code) {
   return request({

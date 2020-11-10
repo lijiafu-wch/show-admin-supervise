@@ -43,6 +43,16 @@ export function delJob(jobId) {
   })
 }
 
+// 刷新缓存
+export function refresh(query) {
+  return request({
+    url: '/monitor/cache/refresh',
+    method: 'get',
+    params: query
+  })
+}
+
+
 // 导出定时任务调度
 export function exportJob(query) {
   return request({
