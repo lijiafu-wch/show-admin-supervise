@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="treelistbox">
-        <el-tree class="treelist" v-show="treeFlag" node-key="id" :default-expanded-keys="[1]" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"  />
+        <el-tree class="treelist" v-show="treeFlag" node-key="id" :default-expanded-keys="[1]" :data="treeData" accordion :props="defaultProps" @node-click="handleNodeClick"  />
         <i class="el-icon-s-unfold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="!treeFlag"></i>
         <i class="el-icon-s-fold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="treeFlag"></i>
     </div>
