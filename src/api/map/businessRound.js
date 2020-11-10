@@ -1,9 +1,25 @@
+/*
+ * @Author: your name
+ * @Date: 2020-08-23 09:00:10
+ * @LastEditTime: 2020-11-10 21:12:53
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /show-admin-supervise/src/api/map/businessRound.js
+ */
 import request from '@/utils/request'
 
 // 查询商圈列表
 export function listBusinessRound(query) {
   return request({
     url: '/map/businessRound/list',
+    method: 'get',
+    params: query
+  })
+}
+// 查询商圈树列表
+export function listBusinessRoundtree(query) {
+  return request({
+    url: '/map/businessRound/county/get',
     method: 'get',
     params: query
   })

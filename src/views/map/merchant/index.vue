@@ -36,7 +36,13 @@
           />
         </el-form-item>
         <el-form-item label="商圈" prop="businessRoundId">
-          <el-select
+           <el-cascader
+          @change="businessRoundIdhandleChange"
+          :props="{ label: 'name', value: 'id', children: 'businessRounds'}"
+          :options="businessRoundIdoptions"
+          >
+          </el-cascader>
+          <!-- <el-select
             v-model="queryParams.businessRoundId"
             placeholder="商圈"
             clearable
@@ -49,7 +55,7 @@
               :label="dict.label"
               :value="dict.value"
             />
-          </el-select>
+          </el-select> -->
         </el-form-item>
         <el-form-item label="成立日期">
           <el-date-picker
@@ -351,7 +357,15 @@
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span> 企业名称</div>
             <el-input v-model="form.name" style="width: 33.3%" class="ib info_border_r" placeholder="请输入内容" />
             <div style="width: 16.6%" class="info_th ib info_border_r">商圈</div>
-            <el-select
+            <el-cascader
+              v-model="form.businessRoundId"
+              @change="businessRoundIdhandleChangeForm"
+              :props="{ label: 'name', value: 'id', children: 'businessRounds'}"
+              :options="businessRoundIdoptions"
+              style="width: 32.6%"
+              >
+            </el-cascader>
+            <!-- <el-select
               v-model="form.businessRoundId"
               placeholder="商圈"
               clearable
@@ -364,7 +378,7 @@
                 :label="dict.label"
                 :value="dict.value"
               />
-            </el-select>
+            </el-select> -->
           </div>
           <div class="info_flex info_border_b info_border_l info_border_r">
             <div style="width: 16.6%" class="info_th ib info_border_r"><span class="must">*</span>统一社会信用代码</div>
@@ -595,7 +609,7 @@
 <script>
 import { listMerchant, getMerchant, delMerchant, disCode, addMerchant, updateMerchant, exportMerchant, merchantimportTemplate, merchantimportLongitudeTemplate } from '@/api/map/merchant'
 import { allDistrict } from '@/api/map/district'
-import { listBusinessRound } from '@/api/map/businessRound'
+import { listBusinessRoundtree, listBusinessRound } from '@/api/map/businessRound'
 import { listBusinessCategory } from '@/api/map/businessCategory'
 import { getToken } from '@/utils/auth'
 import Editor from '@/components/Editor'
@@ -616,6 +630,7 @@ export default {
     return {
       treeFlag: false,
       ShowMore: false,
+      businessRoundIdoptions: [], // 商圈树参数
       activeName: 'first',
       countyCode: [''], // 街道假
       businessCategoryContent: [], // 分类假
@@ -739,6 +754,7 @@ export default {
     this.getAllDistrict()
     this.getListBusinessCategory()
     this.getlistBusinessRound()
+    // this.rrrrr()
     // 字典 经营状态
     this.getDicts('map_operation_status').then(response => {
       this.operationList = response.data
@@ -779,6 +795,16 @@ export default {
       this.mapCenter = ''
       this.showMap = false
     },
+    businessRoundIdhandleChange (val) {
+      console.log(val);
+      if (!val) return
+      this.queryParams.businessRoundId = val[1]
+    },
+     businessRoundIdhandleChangeForm (val) {
+      console.log(val);
+      if (!val) return
+      this.form.businessRoundId = val[1]
+    },
     submitMap() {
       if (!this.mapCenter) {
         return
@@ -795,16 +821,27 @@ export default {
     },
     // 商圈查询赋值
     getlistBusinessRound() {
-      listBusinessRound()
+      listBusinessRoundtree()
         .then(response => {
-          response.rows.forEach(element => {
-            this.businessRoundlist.push({ key: element.id, value: element.id, label: element.name })
-          })
+          console.log('222', response.data);
+          this.businessRoundIdoptions = response.data
+          // response.rows.forEach(element => {
+          //   this.businessRoundlist.push({ key: element.id, value: element.id, label: element.name })
+          // })
         })
         .catch((response) => {
           console.log('失败', response)
         })
     },
+    // rrrrr() {
+    //   listBusinessRound()
+    //     .then(response => {
+    //       console.log('34234235', response);
+    //     })
+    //     .catch((response) => {
+    //       console.log('失败', response)
+    //     })
+    // },
     // 经营状态
     operationFormat(row, column) {
       return this.selectDictLabel(this.operationList, row.operationStatus)
