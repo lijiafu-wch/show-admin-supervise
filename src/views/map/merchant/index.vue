@@ -26,7 +26,7 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="法人代表" prop="legalPerson">
+        <el-form-item label="法人代表" prop="legalPerson" v-show="showqueryMore">
           <el-input
             v-model="queryParams.legalPerson"
             placeholder="请输入法人代表"
@@ -35,7 +35,7 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="商圈" prop="businessRoundId">
+        <el-form-item label="商圈" prop="businessRoundId" v-show="showqueryMore">
            <el-cascader
           v-model="businessRoundId"
           @change="businessRoundIdhandleChange"
@@ -58,7 +58,7 @@
             />
           </el-select> -->
         </el-form-item>
-        <el-form-item label="成立日期">
+        <el-form-item label="成立日期" v-show="showqueryMore">
           <el-date-picker
             v-model="dateRange"
             size="small"
@@ -70,8 +70,7 @@
             end-placeholder="结束日期"
           />
         </el-form-item>
-
-        <el-form-item label="经营状态" prop="operationStatus">
+        <el-form-item label="经营状态" prop="operationStatus" v-show="showqueryMore">
           <el-select v-model="queryParams.operationStatus" placeholder="请选择经营状态" clearable size="small">
             <el-option
               v-for="item in operationList"
@@ -81,7 +80,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="特殊状态" prop="specialStatus">
+        <el-form-item label="特殊状态" prop="specialStatus" v-show="showqueryMore">
           <el-select v-model="queryParams.specialStatus" placeholder="请选择特殊状态" clearable size="small">
             <el-option
               v-for="item2 in specialList"
@@ -91,7 +90,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="行业分类">
+        <el-form-item label="行业分类" v-show="showqueryMore">
           <el-cascader
             ref="cascader"
             v-model="businessCategoryContent"
@@ -102,7 +101,7 @@
             :options="optionsBusinessCategory"
             @change="businessCategoryChange"
           />
-
+           
         </el-form-item>
         <!--
         <el-form-item label="是否在平台公开" prop="publicStatus">
@@ -118,6 +117,8 @@
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          <span @click="()=> { this.showqueryMore = !this.showqueryMore }" style="color: #4190F7;margin-left: 8px;cursor: pointer;"  v-show="!showqueryMore">展开<i class="el-icon-arrow-down"></i></span>
+          <span  @click="()=> { this.showqueryMore = !this.showqueryMore }" style="color: #4190F7;margin-left: 8px;cursor: pointer;"  v-show="showqueryMore">收起<i class="el-icon-arrow-up"></i></span>
         </el-form-item>
       </el-form>
       <el-row :gutter="10" class="mb8">
@@ -631,6 +632,7 @@ export default {
     return {
       treeFlag: false,
       ShowMore: false,
+      showqueryMore: false,
       businessRoundId: undefined,
       businessRoundIdoptions: [], // 商圈树参数
       activeName: 'first',
