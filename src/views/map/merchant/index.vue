@@ -7,9 +7,10 @@
     </div>
     <div v-show="treeFlag" class="treeline" />
     <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }">
-      <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
+      <el-form ref="queryForm" :model="queryParams" :inline="true">
         <el-form-item label="企业名称" prop="name">
           <el-input
+          style="width: 240px"
             v-model="queryParams.name"
             placeholder="请输入企业名称"
             clearable
@@ -17,7 +18,7 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="社会信用代码" prop="creditCode" label-width="100px">
+        <el-form-item label="社会信用代码" prop="creditCode">
           <el-input
             v-model="queryParams.creditCode"
             placeholder="请输入统一社会信用代码"
@@ -25,12 +26,6 @@
             size="small"
             @keyup.enter.native="handleQuery"
           />
-        </el-form-item>
-        <el-form-item label="是否存在经纬度" prop="showStatus">
-          <el-radio-group v-model="queryParams.showStatus">
-            <el-radio label="0">全部</el-radio>
-            <el-radio label="1">不存在</el-radio>
-          </el-radio-group>
         </el-form-item>
 
         <el-form-item v-show="showqueryMore" label="法人代表" prop="legalPerson">
@@ -49,21 +44,9 @@
             :options="businessRoundIdoptions"
             @change="businessRoundIdhandleChange"
           />
-          <!-- <el-select
-            v-model="queryParams.businessRoundId"
-            placeholder="商圈"
-            clearable
-            style="width: 240px"
-            size="small"
-          >
-            <el-option
-              v-for="dict in businessRoundlist"
-              :key="dict.key"
-              :label="dict.label"
-              :value="dict.value"
-            />
-          </el-select> -->
-        </el-form-item>
+           </el-form-item>
+
+
         <el-form-item v-show="showqueryMore" label="成立日期">
           <el-date-picker
             v-model="dateRange"
@@ -77,7 +60,7 @@
           />
         </el-form-item>
         <el-form-item v-show="showqueryMore" label="经营状态" prop="operationStatus">
-          <el-select v-model="queryParams.operationStatus" placeholder="请选择经营状态" clearable size="small">
+          <el-select v-model="queryParams.operationStatus"   placeholder="请选择经营状态" clearable size="small">
             <el-option
               v-for="item in operationList"
               :key="item.dictValue"
@@ -100,7 +83,6 @@
           <el-cascader
             ref="cascader"
             v-model="businessCategoryContent"
-            style="width: 240px"
             placeholder="行业分类"
             :props="{ checkStrictly: true }"
             clearable
@@ -109,17 +91,10 @@
           />
 
         </el-form-item>
-        <!--
-        <el-form-item label="是否在平台公开" prop="publicStatus">
-          <el-select v-model="queryParams.publicStatus" placeholder="请选择是否在平台公开" clearable size="small">
-             <el-option
-              v-for="item3 in publicList"
-              :key="item3.dictValue"
-              :label="item3.dictLabel"
-              :value="item3.dictValue"
-            />
-          </el-select>
-        </el-form-item> -->
+
+        <el-form-item v-show="showqueryMore" prop="showStatus">
+          <el-checkbox    v-model="showStatusFlag" @change="showStatusChange">无经纬度数据</el-checkbox>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -708,6 +683,8 @@ export default {
       open: false,
       // 是否显示地图弹出层
       showMap: false,
+      // 是否选中无经纬度数据
+      showStatusFlag: 0,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -740,7 +717,8 @@ export default {
         pictureTwo: undefined,
         excelNo: undefined,
         deleted: undefined,
-        exportStatus: 1
+        exportStatus: 1,
+        showStatus: 0
       },
       currentId: '',
       // 表单参数
@@ -1310,6 +1288,15 @@ export default {
     // 提交上传文件
     submitLongitudeFileForm() {
       this.$refs.longitudeUpload.submit()
+    },
+    showStatusChange() {
+      if (this.showStatusFlag) {
+        this.queryParams.showStatus = 1
+      } else {
+        this.queryParams.showStatus = 0
+      }
+      this.queryParams.pageNum = 1
+      this.getList()
     }
   }
 }
