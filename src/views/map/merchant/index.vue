@@ -1,15 +1,16 @@
 <template>
   <div class="app-container">
     <div class="treelistbox">
-        <el-tree class="treelist" v-show="treeFlag" node-key="id" :default-expanded-keys="[1]" :data="treeData" accordion :props="defaultProps" @node-click="handleNodeClick"  />
-        <i class="el-icon-s-unfold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="!treeFlag"></i>
-        <i class="el-icon-s-fold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" v-show="treeFlag"></i>
+      <el-tree v-show="treeFlag" class="treelist" node-key="id" :default-expanded-keys="[1]" :data="treeData" accordion :props="defaultProps" @node-click="handleNodeClick" />
+      <i v-show="!treeFlag" class="el-icon-s-unfold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" />
+      <i v-show="treeFlag" class="el-icon-s-fold iconshow" style="cursor: pointer;margin: 0 3px" @click="checkTree" />
     </div>
     <div v-show="treeFlag" class="treeline" />
     <div :class="{'treeGrid':treeFlag, 'treeGridclose':!treeFlag }">
-      <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="110px">
+      <el-form ref="queryForm" :model="queryParams" :inline="true">
         <el-form-item label="企业名称" prop="name">
           <el-input
+          style="width: 240px"
             v-model="queryParams.name"
             placeholder="请输入企业名称"
             clearable
@@ -17,7 +18,7 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="社会信用代码" prop="creditCode" label-width="100px">
+        <el-form-item label="社会信用代码" prop="creditCode">
           <el-input
             v-model="queryParams.creditCode"
             placeholder="请输入统一社会信用代码"
@@ -26,7 +27,8 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="法人代表" prop="legalPerson" v-show="showqueryMore">
+
+        <el-form-item v-show="showqueryMore" label="法人代表" prop="legalPerson">
           <el-input
             v-model="queryParams.legalPerson"
             placeholder="请输入法人代表"
@@ -35,30 +37,17 @@
             @keyup.enter.native="handleQuery"
           />
         </el-form-item>
-        <el-form-item label="商圈" prop="businessRoundId" v-show="showqueryMore">
-           <el-cascader
-          v-model="businessRoundId"
-          @change="businessRoundIdhandleChange"
-          :props="{ label: 'name', value: 'id', children: 'businessRounds'}"
-          :options="businessRoundIdoptions"
-          >
-          </el-cascader>
-          <!-- <el-select
-            v-model="queryParams.businessRoundId"
-            placeholder="商圈"
-            clearable
-            style="width: 240px"
-            size="small"
-          >
-            <el-option
-              v-for="dict in businessRoundlist"
-              :key="dict.key"
-              :label="dict.label"
-              :value="dict.value"
-            />
-          </el-select> -->
-        </el-form-item>
-        <el-form-item label="成立日期" v-show="showqueryMore">
+        <el-form-item v-show="showqueryMore" label="商圈" prop="businessRoundId">
+          <el-cascader
+            v-model="businessRoundId"
+            :props="{ label: 'name', value: 'id', children: 'businessRounds'}"
+            :options="businessRoundIdoptions"
+            @change="businessRoundIdhandleChange"
+          />
+           </el-form-item>
+
+
+        <el-form-item v-show="showqueryMore" label="成立日期">
           <el-date-picker
             v-model="dateRange"
             size="small"
@@ -70,8 +59,8 @@
             end-placeholder="结束日期"
           />
         </el-form-item>
-        <el-form-item label="经营状态" prop="operationStatus" v-show="showqueryMore">
-          <el-select v-model="queryParams.operationStatus" placeholder="请选择经营状态" clearable size="small">
+        <el-form-item v-show="showqueryMore" label="经营状态" prop="operationStatus">
+          <el-select v-model="queryParams.operationStatus"   placeholder="请选择经营状态" clearable size="small">
             <el-option
               v-for="item in operationList"
               :key="item.dictValue"
@@ -80,7 +69,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="特殊状态" prop="specialStatus" v-show="showqueryMore">
+        <el-form-item v-show="showqueryMore" label="特殊状态" prop="specialStatus">
           <el-select v-model="queryParams.specialStatus" placeholder="请选择特殊状态" clearable size="small">
             <el-option
               v-for="item2 in specialList"
@@ -90,35 +79,27 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="行业分类" v-show="showqueryMore">
+        <el-form-item v-show="showqueryMore" label="行业分类">
           <el-cascader
             ref="cascader"
             v-model="businessCategoryContent"
-            style="width: 240px"
             placeholder="行业分类"
             :props="{ checkStrictly: true }"
             clearable
             :options="optionsBusinessCategory"
             @change="businessCategoryChange"
           />
-           
+
         </el-form-item>
-        <!--
-        <el-form-item label="是否在平台公开" prop="publicStatus">
-          <el-select v-model="queryParams.publicStatus" placeholder="请选择是否在平台公开" clearable size="small">
-             <el-option
-              v-for="item3 in publicList"
-              :key="item3.dictValue"
-              :label="item3.dictLabel"
-              :value="item3.dictValue"
-            />
-          </el-select>
-        </el-form-item> -->
+
+        <el-form-item v-show="showqueryMore" prop="showStatus">
+          <el-checkbox    v-model="showStatusFlag" @change="showStatusChange">无经纬度数据</el-checkbox>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
           <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          <span @click="()=> { this.showqueryMore = !this.showqueryMore }" style="color: #4190F7;margin-left: 8px;cursor: pointer;"  v-show="!showqueryMore">展开<i class="el-icon-arrow-down"></i></span>
-          <span  @click="()=> { this.showqueryMore = !this.showqueryMore }" style="color: #4190F7;margin-left: 8px;cursor: pointer;"  v-show="showqueryMore">收起<i class="el-icon-arrow-up"></i></span>
+          <span v-show="!showqueryMore" style="color: #4190F7;margin-left: 8px;cursor: pointer;" @click="()=> { this.showqueryMore = !this.showqueryMore }">展开<i class="el-icon-arrow-down" /></span>
+          <span v-show="showqueryMore" style="color: #4190F7;margin-left: 8px;cursor: pointer;" @click="()=> { this.showqueryMore = !this.showqueryMore }">收起<i class="el-icon-arrow-up" /></span>
         </el-form-item>
       </el-form>
       <el-row :gutter="10" class="mb8">
@@ -361,12 +342,11 @@
             <div style="width: 16.6%" class="info_th ib info_border_r">商圈</div>
             <el-cascader
               v-model="form.businessRoundId"
-              @change="businessRoundIdhandleChangeForm"
               :props="{ label: 'name', value: 'id', children: 'businessRounds'}"
               :options="businessRoundIdoptions"
               style="width: 32.6%"
-              >
-            </el-cascader>
+              @change="businessRoundIdhandleChangeForm"
+            />
             <!-- <el-select
               v-model="form.businessRoundId"
               placeholder="商圈"
@@ -703,6 +683,8 @@ export default {
       open: false,
       // 是否显示地图弹出层
       showMap: false,
+      // 是否选中无经纬度数据
+      showStatusFlag: 0,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -735,7 +717,8 @@ export default {
         pictureTwo: undefined,
         excelNo: undefined,
         deleted: undefined,
-        exportStatus: 1
+        exportStatus: 1,
+        showStatus: 0
       },
       currentId: '',
       // 表单参数
@@ -799,13 +782,13 @@ export default {
       this.mapCenter = ''
       this.showMap = false
     },
-    businessRoundIdhandleChange (val) {
-      console.log(val);
+    businessRoundIdhandleChange(val) {
+      console.log(val)
       if (!val) return
       this.queryParams.businessRoundId = val[1]
     },
-     businessRoundIdhandleChangeForm (val) {
-      console.log(val);
+    businessRoundIdhandleChangeForm(val) {
+      console.log(val)
       if (!val) return
       this.form.businessRoundId = val[1]
     },
@@ -827,7 +810,7 @@ export default {
     getlistBusinessRound() {
       listBusinessRoundtree()
         .then(response => {
-          console.log('222', response.data);
+          console.log('222', response.data)
           this.businessRoundIdoptions = response.data
           // response.rows.forEach(element => {
           //   this.businessRoundlist.push({ key: element.id, value: element.id, label: element.name })
@@ -1305,6 +1288,15 @@ export default {
     // 提交上传文件
     submitLongitudeFileForm() {
       this.$refs.longitudeUpload.submit()
+    },
+    showStatusChange() {
+      if (this.showStatusFlag) {
+        this.queryParams.showStatus = 1
+      } else {
+        this.queryParams.showStatus = 0
+      }
+      this.queryParams.pageNum = 1
+      this.getList()
     }
   }
 }

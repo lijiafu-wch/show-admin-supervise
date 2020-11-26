@@ -104,6 +104,14 @@
 
     <el-table v-loading="loading" :data="businessRoundList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+      
+      <el-table-column
+        label="商圈ID"
+        align="center"
+        prop="id"
+        :show-overflow-tooltip="true"
+      />
+      
       <el-table-column
         label="商圈名称"
         align="center"

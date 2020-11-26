@@ -46,7 +46,7 @@ export function delJob(jobId) {
 // 刷新缓存
 export function refresh(query) {
   return request({
-    url: '/monitor/cache/refresh',
+    url: '/monitor/job/cache/refresh',
     method: 'get',
     params: query
   })
