@@ -150,15 +150,21 @@
           >收起证书明细</el-button>
         </el-col>
         <el-col :span="1.5">
-          <el-button
-            v-hasPermi="['system:user:import']"
-            type="info"
-            icon="el-icon-upload2"
-            size="mini"
-            @click="handleImport"
-          >数据导入</el-button>
+          <el-dropdown>
+            <el-button type="info" size="mini">
+              导入<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item >
+                <span v-hasPermi="['system:user:import']" @click="handleImport">数据导入</span>
+              </el-dropdown-item>
+              <el-dropdown-item >
+                <span v-hasPermi="['system:user:import']" @click="handleImportLongitude">经纬度导入</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </el-col>
-        <el-col :span="1.5">
+        <!-- <el-col :span="1.5">
           <el-button
             v-hasPermi="['system:user:import']"
             type="info"
@@ -166,17 +172,33 @@
             size="mini"
             @click="handleImportLongitude"
           >经纬度导入</el-button>
-        </el-col>
+        </el-col> -->
         <el-col :span="1.5">
-          <el-button
+          <el-dropdown>
+            <el-button type="info" size="mini">
+              导出<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item >
+                <span v-hasPermi="['system:user:import']" @click="handleExport(1)">导出当前页</span>
+              </el-dropdown-item>
+              <el-dropdown-item >
+                <span v-hasPermi="['system:user:import']" @click="handleExport(2)">导出按条件</span>
+              </el-dropdown-item>
+               <el-dropdown-item >
+                <span  @click="handleExport(3)">导出所有</span>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+          <!-- <el-button
             v-hasPermi="['map:merchant:export']"
             type="warning"
             icon="el-icon-download"
             size="mini"
             @click="handleExport(1)"
-          >导出当前页</el-button>
+          >导出当前页</el-button> -->
         </el-col>
-        <el-col :span="1.5">
+        <!-- <el-col :span="1.5">
           <el-button
             v-hasPermi="['map:merchant:export']"
             type="warning"
@@ -184,8 +206,8 @@
             size="mini"
             @click="handleExport(2)"
           >导出按条件</el-button>
-        </el-col>
-        <el-col :span="1.5">
+        </el-col> -->
+        <!-- <el-col :span="1.5">
           <el-button
             v-hasPermi="['map:merchant:export']"
             type="warning"
@@ -193,7 +215,7 @@
             size="mini"
             @click="handleExport(3)"
           >导出所有</el-button>
-        </el-col>
+        </el-col> -->
 
       </el-row>
       <el-table v-loading="loading" :data="merchantList" @row-click="rowClick" @selection-change="handleSelectionChange">
