@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-29 12:17:34
- * @LastEditTime: 2020-11-29 21:27:58
+ * @LastEditTime: 2020-11-30 17:09:59
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /show-admin-supervise/src/api/index/index.js
@@ -9,20 +9,20 @@
 import request from '@/utils/request'
 
 // 商家经营状态数量
-export function getNum(query) {
+export function getNum(data) {
   return request({
-    url: 'map/home/merchantInfo/num',
-    method: 'GET',
-    params: query
+    url: '/map/home/merchantInfo/nums',
+    method: 'post',
+    data: data
   })
 }
 
 // 行业分类数量统计
 export function getCategory(data) {
     return request({
-      url: '/map/home/category/num',
-      method: 'GET',
-      params: data
+      url: '/map/home/category/nums',
+      method: 'post',
+      data: data
     })
   }
 

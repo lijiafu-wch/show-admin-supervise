@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-08-23 09:00:10
- * @LastEditTime: 2020-11-29 21:35:48
+ * @LastEditTime: 2020-11-30 17:28:43
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /show-admin-supervise/src/views/index.vue
@@ -11,7 +11,7 @@
 		<MerchantsNum @MerchantsId="MerchantsId"></MerchantsNum>
 		<el-row style="background: #fff; padding: 16px 16px 0; margin-bottom: 32px">
 			<bar-chart-top
-			  ref="charttop"
+				ref="charttop"
 				:topseries="topseries"
 				:topxAxis="topxAxis"
 			/>
@@ -66,11 +66,12 @@ export default {
 	methods: {
 		MerchantsId(val) {
 			// 获取行业分类数据
-			getCategory({countyCode: val})
+			getCategory({ codes: val })
 				.then((response) => {
+					console.log("1111", response);
 					this.topxAxis = [];
-          this.topseries = [];
-          const arr = response.data
+					this.topseries = [];
+					const arr = response.data;
 					// const arr = [
 					// 	{
 					// 		firstCategory: "F",
@@ -121,7 +122,8 @@ export default {
 								barWidth: "60%",
 								color: ["#92D050"],
 								data: arr1,
-								animationDuration: 300,
+								animationDuration: 300
+								
 							},
 							{
 								name: element.merchantOperationDto.operationStatusB,
@@ -149,12 +151,21 @@ export default {
 								color: ["#FF0000"],
 								data: arr4,
 								animationDuration: 300,
+								// label: {
+								// 	normal: {
+								// 		// offset: ["50", "80"],
+								// 		show: true,
+								// 		position: "top",
+								// 		formatter: "{c}",
+								// 		textStyle: { color: "#000" },
+								// 	},
+								// },
 							},
 						];
-          });
-          this.$nextTick(()=> {
-            this.$refs.charttop.initChart()
-          })
+					});
+					this.$nextTick(() => {
+						this.$refs.charttop.initChart();
+					});
 				})
 				.catch((response) => {
 					console.log("失败", response);

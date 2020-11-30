@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-11-29 11:07:19
- * @LastEditTime: 2020-11-29 20:14:06
+ * @LastEditTime: 2020-11-30 17:15:04
  * @LastEditors: Please set LastEditors
  * @Description: 商家数量区域
  * @FilePath: /show-admin-supervise/src/views/dashboard/BuildNum.vue
@@ -10,7 +10,7 @@
 	<div class="numBox">
 		<div class="numItemleft">
 			<h5>商家总数量</h5>
-			<div style="margin-top: 45px" class="numText">
+			<div style="margin-top: 45px;font-size: 32px;" class="numText">
 				{{ MerchantsObj.totalNum | toThousands }}
 			</div>
 		</div>
@@ -46,6 +46,8 @@
 						<el-select
 							v-model="countyCode"
 							placeholder="区域选择"
+							:multiple="true"
+							collapse-tags
 							size="small"
                             @change="countyCodeget"
 						>
@@ -128,19 +130,26 @@ export default {
 		},
 	},
 	created() {
-        this.getData();
         this.getDicts('map_county_code').then(response => {
             this.countyCodeList = response.data
-			this.countyCode = response.data[0].dictValue
-			this.$emit("MerchantsId", response.data[0].dictValue);
+			this.countyCode = [response.data[0].dictValue]
+	        this.getData();
+			this.$emit("MerchantsId", [response.data[0].dictValue]);
         })
 	},
 	methods: {
         countyCodeget (val) {
+			console.log(val.length);
+			if (!val.length) {
+				this.countyCode = [this.countyCodeList[0].dictValue]
+				this.getData();
+				this.$emit("MerchantsId", this.countyCode);
+				return
+			}
 			this.$emit("MerchantsId", val);
         },
 		getData() {
-			getNum().then((response) => {
+			getNum({ codes: this.countyCode }).then((response) => {
 				console.log(response);
 				if (response.code === 200) {
 					this.MerchantsObj = response.data;

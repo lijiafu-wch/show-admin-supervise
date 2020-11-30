@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-08-23 09:00:10
- * @LastEditTime: 2020-11-29 21:42:45
+ * @LastEditTime: 2020-11-30 17:13:16
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /show-admin-supervise/src/views/dashboard/PieChart.vue
@@ -90,8 +90,8 @@ export default {
           {
             name: '营业状态',
             type: 'pie',
-            roseType: 'radius',
-            radius: [15, 95],
+            // roseType: 'radius',
+            radius: '55%',
             center: ['50%', '40%'],
             data: this.list,
             itemStyle: {
