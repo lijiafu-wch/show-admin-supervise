@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-08-23 09:00:10
- * @LastEditTime: 2020-11-30 17:28:43
+ * @LastEditTime: 2020-12-01 09:32:22
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /show-admin-supervise/src/views/index.vue
@@ -108,12 +108,19 @@ export default {
 					var arr2 = [];
 					var arr3 = [];
 					var arr4 = [];
+					var arr5 = [];
 					arr.forEach((element) => {
 						this.topxAxis.push(element.firstCategoryName);
 						arr1.push(element.merchantOperationDto.operationStatusANum);
 						arr2.push(element.merchantOperationDto.operationStatusBNum);
 						arr3.push(element.merchantOperationDto.operationStatusCNum);
 						arr4.push(element.merchantOperationDto.operationStatusDNum);
+						arr5.push(
+							element.merchantOperationDto.operationStatusANum +
+								element.merchantOperationDto.operationStatusBNum +
+								element.merchantOperationDto.operationStatusCNum +
+								element.merchantOperationDto.operationStatusDNum
+						);
 						this.topseries = [
 							{
 								name: element.merchantOperationDto.operationStatusA,
@@ -122,8 +129,7 @@ export default {
 								barWidth: "60%",
 								color: ["#92D050"],
 								data: arr1,
-								animationDuration: 300
-								
+								animationDuration: 300,
 							},
 							{
 								name: element.merchantOperationDto.operationStatusB,
@@ -160,6 +166,23 @@ export default {
 								// 		textStyle: { color: "#000" },
 								// 	},
 								// },
+							},
+							{
+								name: "总数",
+								type: "bar",
+								barWidth: "60%",
+								barGap: "-100%",
+								color: ["rgba(0, 0, 0, 0)"],
+								data: arr5,
+								animationDuration: 300,
+								label: {
+									normal: {
+										show: true, //显示数值
+										position: "top", //  位置设为top
+										formatter: "{c}",
+										textStyle: { color: "#000" }, //设置数值颜色
+									},
+								},
 							},
 						];
 					});
