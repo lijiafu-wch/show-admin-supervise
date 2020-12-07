@@ -1,5 +1,6 @@
 <template>
   <div class="login">
+    <img class="bac" src="../assets/image/login-background.jpg" alt="">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">市场监督局企业数据管理平台</h3>
       <el-form-item prop="username">
@@ -143,13 +144,22 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
+.bac {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  // background-image: url("../assets/image/login-background.jpg");
+  // background-size: 100%;
+}
 .login {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/image/login-background.jpg");
-  background-size: 100%;
+  // background-image: url("../assets/image/login-background.jpg");
+  // background-size: 100%;
 }
 .title {
   margin: 0px auto 30px auto;
@@ -158,6 +168,7 @@ export default {
 }
 
 .login-form {
+  z-index: 5;
   border-radius: 6px;
   background: #ffffff;
   width: 400px;
