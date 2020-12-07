@@ -274,11 +274,12 @@ input:focus {
             timer = setTimeout(function () {
                 let center = map.getCenter();
                 console.log(val, center);
-                $.get('https://restapi.amap.com/v3/assistant/inputtips?output=json&location=' + ([center.lng, center.lat].join(',')) + '&keywords=七台河' + val + '&key=f290e69e458e618aead61401ee06b37e', function (data) {
-                    let result = [], item;
-                    if (data.tips) {
-                        for (let i = 0; i < data.tips.length; i++) {
-                            item = data.tips[i];
+                // $.get('https://restapi.amap.com/v3/assistant/inputtips?output=json&location=' + ([center.lng, center.lat].join(',')) + '&keywords=七台河' + val + '&key=f290e69e458e618aead61401ee06b37e', function (data) {
+                $.get('http://49.232.203.212:81/front/map/data/list',{"name": val }, function (data) {
+					let result = [], item;
+                    if (data.rows) {
+                        for (let i = 0; i < data.rows.length; i++) {
+                            item = data.rows[i];
                             var itemtitle = item.name + item.district + item.address;
                             typeof item.location == 'string' && item.location ?
                                 result.push('<li>' +
